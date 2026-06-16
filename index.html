@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ناظم‌یار | سامانه هوشمند مدیریت مدرسه</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+  <style>
+    * {
+      font-family: 'Vazirmatn', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px);
+      border-radius: 2rem;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .gradient-text {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      background-clip: border-box;
+      color: transparent;
+    }
+
+    .btn-hover {
+      transition: all 0.3s ease;
+    }
+
+    .btn-hover:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.3);
+    }
+  </style>
+</head>
+<body class="flex items-center justify-center p-5 min-h-screen">
+<div class="max-w-4xl w-full">
+  <div class="glass-card p-8 md:p-12 text-center">
+    <div class="text-7xl mb-6">🎓</div>
+    <h1 class="text-4xl md:text-6xl font-extrabold gradient-text mb-4">ناظم‌یار</h1>
+    <p class="text-xl text-white/80 mb-2">سامانه هوشمند مدیریت آموزشی–تربیتی مدارس</p>
+    <p class="text-white/60 mb-8">طراحی و توسعه: امیر حسین ناظم</p>
+
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-8">
+      <a href="admin_panel.html" class="glass-card p-4 text-white font-bold hover:bg-white/20 transition btn-hover">
+        <i class="fas fa-user-tie text-3xl block mb-2"></i>
+        پنل مدیر
+      </a>
+      <a href="nazem_panel.html" class="glass-card p-4 text-white font-bold hover:bg-white/20 transition btn-hover">
+        <i class="fas fa-user-shield text-3xl block mb-2"></i>
+        پنل ناظم
+      </a>
+      <a href="teacher_panel.html" class="glass-card p-4 text-white font-bold hover:bg-white/20 transition btn-hover">
+        <i class="fas fa-chalkboard-user text-3xl block mb-2"></i>
+        پنل معلم
+      </a>
+      <a href="student_panel.html" class="glass-card p-4 text-white font-bold hover:bg-white/20 transition btn-hover">
+        <i class="fas fa-user-graduate text-3xl block mb-2"></i>
+        پنل دانش‌آموز
+      </a>
+    </div>
+
+    <div class="mt-8 text-white/40 text-sm">
+      <i class="fas fa-info-circle ml-1"></i>
+      برای ورود به پنل‌ها، ابتدا در پنل مدیر حساب کاربری بسازید
+    </div>
+  </div>
+</div>
+</body>
+</html>
