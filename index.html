@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>ناظم‌یار | پیشرفته‌ترین سامانه مدیریت آموزشی ایران</title>
+
+  <!-- TailwindCSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+  <!-- Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      font-family: 'Vazirmatn', sans-serif;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+      min-height: 100vh;
+    }
+
+    /* انیمیشن‌ها */
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-20px) rotate(2deg); }
+    }
+
+    @keyframes float-reverse {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(20px) rotate(-2deg); }
+    }
+
+    @keyframes glow {
+      0%, 100% { box-shadow: 0 0 20px rgba(99, 102, 241, 0.3); }
+      50% { box-shadow: 0 0 60px rgba(99, 102, 241, 0.6); }
+    }
+
+    @keyframes shimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    @keyframes fadeInUp {
+      from { transform: translateY(50px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .animate-float { animation: float 6s ease-in-out infinite; }
+    .animate-float-reverse { animation: float-reverse 7s ease-in-out infinite; }
+    .animate-glow { animation: glow 3s ease-in-out infinite; }
+    .animate-fade-up { animation: fadeInUp 0.8s ease-out; }
+
+    /* کارت شیشه‌ای */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(20px);
+      border-radius: 2rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .glass-card:hover {
+      transform: translateY(-10px) scale(1.02);
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(99, 102, 241, 0.4);
+      box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.5);
+    }
+
+    /* کارت پنل‌ها */
+    .panel-card {
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(10px);
+      border-radius: 1.5rem;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .panel-card:hover {
+      transform: translateY(-8px);
+      border-color: rgba(99, 102, 241, 0.3);
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.4);
+    }
+
+    .panel-card::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+
+    .panel-card:hover::after {
+      opacity: 1;
+    }
+
+    .panel-card .content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .panel-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      transition: all 0.3s;
+    }
+
+    .panel-card:hover .panel-icon {
+      transform: scale(1.1) rotate(-5deg);
+    }
+
+    /* دکمه‌ها */
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 30px -10px rgba(102, 126, 234, 0.5);
+    }
+
+    .btn-primary::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+
+    .btn-primary:hover::before {
+      width: 300px;
+      height: 300px;
+    }
+
+    /* افکت هدر */
+    .gradient-text {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+      background-size: 300% 300%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      animation: gradientShift 5s ease infinite;
+    }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* پارتیکل‌ها */
+    .particle {
+      position: fixed;
+      width: 4px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 0;
+      animation: particleFloat linear infinite;
+    }
+
+    @keyframes particleFloat {
+      0% {
+        transform: translateY(100vh) translateX(0);
+        opacity: 0;
+      }
+      10% { opacity: 0.8; }
+      90% { opacity: 0.8; }
+      100% {
+        transform: translateY(-10vh) translateX(100px);
+        opacity: 0;
+      }
+    }
+
+    /* اسکرول بار */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #1a1a2e; }
+    ::-webkit-scrollbar-thumb { background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 10px; }
+  </style>
+</head>
+<body>
+
+<!-- پارتیکل‌ها -->
+<div id="particles"></div>
+
+<!-- ناوبری -->
+<nav class="fixed top-0 w-full z-50 px-4 py-4" style="background: rgba(15, 12, 41, 0.8); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.05);">
+  <div class="max-w-7xl mx-auto flex justify-between items-center">
+    <div class="flex items-center gap-3">
+      <div class="bg-gradient-to-r from-indigo-600 to-purple-600 p-2.5 rounded-xl">
+        <i class="fas fa-chalkboard-user text-white text-xl"></i>
+      </div>
+      <span class="text-2xl font-extrabold text-white">ناظم‌یار</span>
+    </div>
+
+    <div class="hidden md:flex items-center gap-8">
+      <a href="#features" class="text-white/70 hover:text-white transition">مزایا</a>
+      <a href="#panels" class="text-white/70 hover:text-white transition">پنل‌ها</a>
+      <a href="#about" class="text-white/70 hover:text-white transition">درباره ما</a>
+      <a href="#contact" class="text-white/70 hover:text-white transition">تماس</a>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <a href="admin_panel.html" class="btn-primary text-white px-5 py-2.5 rounded-xl font-medium text-sm shadow-lg">
+        <i class="fas fa-arrow-left ml-1"></i> ورود
+      </a>
+      <button id="mobileMenuBtn" class="md:hidden text-white text-2xl">
+        <i class="fas fa-bars"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- منو موبایل -->
+  <div id="mobileMenu" class="hidden md:hidden mt-4 space-y-3">
+    <a href="#features" class="block text-white/70 hover:text-white py-2 px-4 glass-card rounded-xl">مزایا</a>
+    <a href="#panels" class="block text-white/70 hover:text-white py-2 px-4 glass-card rounded-xl">پنل‌ها</a>
+    <a href="#about" class="block text-white/70 hover:text-white py-2 px-4 glass-card rounded-xl">درباره ما</a>
+    <a href="#contact" class="block text-white/70 hover:text-white py-2 px-4 glass-card rounded-xl">تماس</a>
+  </div>
+</nav>
+
+<!-- بخش اصلی (Hero) -->
+<section class="relative min-h-screen flex items-center justify-center px-4 pt-20 overflow-hidden">
+  <div class="relative z-10 max-w-6xl mx-auto text-center">
+    <div class="animate-fade-up">
+      <div class="inline-block mb-6">
+        <div class="glass-card px-6 py-2 rounded-full">
+          <span class="text-indigo-300 text-sm"><i class="fas fa-star text-yellow-400 ml-1"></i> پیشرفته‌ترین سامانه مدیریت آموزشی ایران</span>
+        </div>
+      </div>
+
+      <h1 class="text-5xl md:text-7xl lg:text-8xl font-black mb-6 leading-tight">
+        <span class="gradient-text">ناظم‌یار</span>
+        <br>
+        <span class="text-white">تحول در</span>
+        <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">آموزش ایران</span>
+      </h1>
+
+      <p class="text-lg md:text-xl text-white/70 max-w-2xl mx-auto mb-10 leading-relaxed">
+        پلتفرم یکپارچه، هوشمند و تحلیل‌محور که مدیریت مدرسه را از حالت سنتی به مدیریت داده‌محور و پیشگیرانه تبدیل می‌کند
+      </p>
+
+      <div class="flex flex-wrap gap-4 justify-center">
+        <a href="#panels" class="btn-primary text-white px-8 py-3.5 rounded-xl font-bold text-lg shadow-xl flex items-center gap-2">
+          <span>شروع کنید</span>
+          <i class="fas fa-arrow-left group-hover:translate-x-1 transition"></i>
+        </a>
+        <a href="#features" class="glass-card text-white px-8 py-3.5 rounded-xl font-bold text-lg flex items-center gap-2 hover:bg-white/10 transition">
+          <i class="fas fa-play-circle"></i>
+          <span>مشاهده مزایا</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- آمار -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mt-16">
+      <div class="glass-card p-5 text-center animate-fade-up" style="animation-delay: 0.1s;">
+        <div class="text-4xl font-black text-indigo-400 animate-float">۱۸+</div>
+        <div class="text-white/60 text-sm mt-1">کلاس فعال</div>
+      </div>
+      <div class="glass-card p-5 text-center animate-fade-up" style="animation-delay: 0.2s;">
+        <div class="text-4xl font-black text-purple-400 animate-float-reverse">۳۶۰+</div>
+        <div class="text-white/60 text-sm mt-1">دانش‌آموز</div>
+      </div>
+      <div class="glass-card p-5 text-center animate-fade-up" style="animation-delay: 0.3s;">
+        <div class="text-4xl font-black text-pink-400 animate-float">۵</div>
+        <div class="text-white/60 text-sm mt-1">پنل تخصصی</div>
+      </div>
+      <div class="glass-card p-5 text-center animate-fade-up" style="animation-delay: 0.4s;">
+        <div class="text-4xl font-black text-cyan-400 animate-float-reverse">۱۰۰%</div>
+        <div class="text-white/60 text-sm mt-1">یکپارچگی داده</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- مزایا -->
+<section id="features" class="py-20 px-4 relative">
+  <div class="max-w-7xl mx-auto">
+    <div class="text-center mb-16">
+      <div class="glass-card inline-block px-5 py-2 rounded-full mb-4">
+        <span class="text-indigo-300 text-sm"><i class="fas fa-sparkles ml-1"></i> قابلیت‌های بی‌نظیر</span>
+      </div>
+      <h2 class="text-4xl md:text-5xl font-bold text-white mb-4">چرا <span class="gradient-text">ناظم‌یار</span>؟</h2>
+      <p class="text-white/50 text-lg max-w-2xl mx-auto">امکاناتی که مدیریت مدرسه را متحول می‌کند</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="glass-card p-8 text-center animate-fade-up" style="animation-delay: 0.1s;">
+        <div class="w-20 h-20 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-2xl flex items-center justify-center mx-auto mb-5 animate-glow">
+          <i class="fas fa-brain text-white text-3xl"></i>
+        </div>
+        <h3 class="text-2xl font-bold text-white mb-3">مدیریت هوشمند</h3>
+        <p class="text-white/60 leading-relaxed">هشدارهای زودهنگام، داشبوردهای تحلیلی پیشرفته و تصمیم‌گیری داده‌محور</p>
+      </div>
+
+      <div class="glass-card p-8 text-center animate-fade-up" style="animation-delay: 0.2s;">
+        <div class="w-20 h-20 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-5 animate-glow">
+          <i class="fas fa-users-viewfinder text-white text-3xl"></i>
+        </div>
+        <h3 class="text-2xl font-bold text-white mb-3">نقش‌محور حرفه‌ای</h3>
+        <p class="text-white/60 leading-relaxed">پنل اختصاصی برای مدیر، ناظم، معلم، دانش‌آموز و اولیا</p>
+      </div>
+
+      <div class="glass-card p-8 text-center animate-fade-up" style="animation-delay: 0.3s;">
+        <div class="w-20 h-20 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-5 animate-glow">
+          <i class="fas fa-chart-line text-white text-3xl"></i>
+        </div>
+        <h3 class="text-2xl font-bold text-white mb-3">تحلیل پیشرفته</h3>
+        <p class="text-white/60 leading-relaxed">نمودارهای تعاملی، گزارشات هوشمند و خروجی اکسل</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- پنل‌ها -->
+<section id="panels" class="py-20 px-4 relative" style="background: rgba(0,0,0,0.3);">
+  <div class="max-w-7xl mx-auto">
+    <div class="text-center mb-16">
+      <div class="glass-card inline-block px-5 py-2 rounded-full mb-4">
+        <span class="text-indigo-300 text-sm"><i class="fas fa-sliders-h ml-1"></i> پنل‌های تخصصی</span>
+      </div>
+      <h2 class="text-4xl md:text-5xl font-bold text-white mb-4">هر نقش، <span class="gradient-text">ابزارهای خودش</span></h2>
+      <p class="text-white/50 text-lg max-w-2xl mx-auto">پنج پنل کاملاً مجزا و حرفه‌ای برای هر کاربر</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+      <a href="admin_panel.html" class="panel-card p-6">
+        <div class="content">
+          <div class="panel-icon bg-gradient-to-r from-blue-600 to-indigo-600">
+            <i class="fas fa-user-tie text-white"></i>
+          </div>
+          <h3 class="text-xl font-bold text-white mt-4">مدیر مدرسه</h3>
+          <p class="text-white/50 text-sm mt-2">داشبورد مدیریتی، گزارشات کلان، مدیریت کامل</p>
+        </div>
+      </a>
+
+      <a href="nazem_panel.html" class="panel-card p-6">
+        <div class="content">
+          <div class="panel-icon bg-gradient-to-r from-purple-600 to-pink-600">
+            <i class="fas fa-user-shield text-white"></i>
+          </div>
+          <h3 class="text-xl font-bold text-white mt-4">ناظم</h3>
+          <p class="text-white/50 text-sm mt-2">مدیریت انضباط، ثبت فعالیت‌ها، نظارت</p>
+        </div>
+      </a>
+
+      <a href="teacher_panel.html" class="panel-card p-6">
+        <div class="content">
+          <div class="panel-icon bg-gradient-to-r from-green-600 to-teal-600">
+            <i class="fas fa-chalkboard-user text-white"></i>
+          </div>
+          <h3 class="text-xl font-bold text-white mt-4">معلم</h3>
+          <p class="text-white/50 text-sm mt-2">ثبت نمرات، تکالیف، ارتباط با اولیا</p>
+        </div>
+      </a>
+
+      <a href="student_panel.html" class="panel-card p-6">
+        <div class="content">
+          <div class="panel-icon bg-gradient-to-r from-amber-600 to-orange-600">
+            <i class="fas fa-user-graduate text-white"></i>
+          </div>
+          <h3 class="text-xl font-bold text-white mt-4">دانش‌آموز</h3>
+          <p class="text-white/50 text-sm mt-2">کارنامه، تکالیف، برنامه هفتگی</p>
+        </div>
+      </a>
+
+      <a href="#" class="panel-card p-6">
+        <div class="content">
+          <div class="panel-icon bg-gradient-to-r from-red-600 to-rose-600">
+            <i class="fas fa-users text-white"></i>
+          </div>
+          <h3 class="text-xl font-bold text-white mt-4">اولیا</h3>
+          <p class="text-white/50 text-sm mt-2">مشاهده وضعیت تحصیلی فرزند</p>
+        </div>
+      </a>
+
+      <a href="admin_panel.html#reportsTab" class="panel-card p-6">
+        <div class="content">
+          <div class="panel-icon bg-gradient-to-r from-indigo-600 to-blue-600">
+            <i class="fas fa-chart-simple text-white"></i>
+          </div>
+          <h3 class="text-xl font-bold text-white mt-4">گزارات پیشرفته</h3>
+          <p class="text-white/50 text-sm mt-2">نمودارهای تعاملی، خروجی اکسل</p>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- درباره ما -->
+<section id="about" class="py-20 px-4 relative">
+  <div class="max-w-7xl mx-auto">
+    <div class="grid md:grid-cols-2 gap-12 items-center">
+      <div class="animate-fade-up">
+        <div class="glass-card inline-block px-5 py-2 rounded-full mb-4">
+          <span class="text-indigo-300 text-sm"><i class="fas fa-info-circle ml-1"></i> درباره ما</span>
+        </div>
+        <h2 class="text-4xl md:text-5xl font-bold text-white mb-6">چرا <span class="gradient-text">ناظم‌یار</span> را ساختیم؟</h2>
+        <p class="text-white/60 text-lg leading-relaxed mb-6">
+          ما یک شکاف بزرگ در سیستم‌های مدیریت مدارس ایران دیدیم: سامانه‌های موجود عمدتاً اداری و ثبت‌محور هستند،
+          اما واقعیت مدرسه در لحظه رخ می‌دهد.
+        </p>
+        <div class="space-y-4">
+          <div class="flex items-center gap-3 text-white/70">
+            <i class="fas fa-check-circle text-green-400 text-xl"></i>
+            <span>ثبت رخدادهای رفتاری و تربیتی در لحظه</span>
+          </div>
+          <div class="flex items-center gap-3 text-white/70">
+            <i class="fas fa-check-circle text-green-400 text-xl"></i>
+            <span>داشبورد تصمیم‌ساز برای مدیر</span>
+          </div>
+          <div class="flex items-center gap-3 text-white/70">
+            <i class="fas fa-check-circle text-green-400 text-xl"></i>
+            <span>هشدارهای زودهنگام برای دانش‌آموزان در معرض خطر</span>
+          </div>
+          <div class="flex items-center gap-3 text-white/70">
+            <i class="fas fa-check-circle text-green-400 text-xl"></i>
+            <span>ارتباط هدفمند با اولیا</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="glass-card p-8 text-center animate-fade-up" style="animation-delay: 0.3s;">
+        <div class="text-8xl mb-6">🎯</div>
+        <h3 class="text-2xl font-bold text-white mb-4">چشم‌انداز ما</h3>
+        <p class="text-white/60 leading-relaxed">
+          "تبدیل مدیریت مدارس ایران از واکنشی به پیش‌نگر،
+          با استفاده از داده و هوش مصنوعی"
+        </p>
+        <div class="mt-6 p-4 glass-card">
+          <p class="text-white/50 text-sm">
+            <i class="fas fa-quote-right ml-2 text-indigo-400"></i>
+            طراحی و توسعه توسط امیر حسین ناظم
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- تماس -->
+<section id="contact" class="py-20 px-4 relative" style="background: rgba(0,0,0,0.3);">
+  <div class="max-w-4xl mx-auto">
+    <div class="text-center mb-16">
+      <div class="glass-card inline-block px-5 py-2 rounded-full mb-4">
+        <span class="text-indigo-300 text-sm"><i class="fas fa-envelope ml-1"></i> تماس با ما</span>
+      </div>
+      <h2 class="text-4xl md:text-5xl font-bold text-white mb-4">درخواست <span class="gradient-text">دمو</span></h2>
+      <p class="text-white/50 text-lg max-w-2xl mx-auto">برای اطلاعات بیشتر و مشاهده دموی زنده با ما تماس بگیرید</p>
+    </div>
+
+    <div class="glass-card p-8">
+      <div class="grid md:grid-cols-2 gap-8">
+        <div class="space-y-6">
+          <div class="flex items-center gap-4 text-white/70">
+            <div class="w-12 h-12 bg-indigo-500/20 rounded-xl flex items-center justify-center">
+              <i class="fas fa-phone text-indigo-400 text-xl"></i>
+            </div>
+            <div>
+              <p class="text-sm text-white/50">تلفن</p>
+              <p class="font-bold">۰۲۱-۱۲۳۴۵۶۷۸</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-4 text-white/70">
+            <div class="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center">
+              <i class="fas fa-envelope text-purple-400 text-xl"></i>
+            </div>
+            <div>
+              <p class="text-sm text-white/50">ایمیل</p>
+              <p class="font-bold">info@nazemyar.ir</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-4 text-white/70">
+            <div class="w-12 h-12 bg-pink-500/20 rounded-xl flex items-center justify-center">
+              <i class="fas fa-map-marker-alt text-pink-400 text-xl"></i>
+            </div>
+            <div>
+              <p class="text-sm text-white/50">آدرس</p>
+              <p class="font-bold">تهران، خیابان ولیعصر</p>
+            </div>
+          </div>
+          <div class="flex gap-4 mt-4">
+            <div class="w-12 h-12 glass-card rounded-xl flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 transition cursor-pointer">
+              <i class="fab fa-telegram text-xl"></i>
+            </div>
+            <div class="w-12 h-12 glass-card rounded-xl flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 transition cursor-pointer">
+              <i class="fab fa-whatsapp text-xl"></i>
+            </div>
+            <div class="w-12 h-12 glass-card rounded-xl flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 transition cursor-pointer">
+              <i class="fab fa-instagram text-xl"></i>
+            </div>
+            <div class="w-12 h-12 glass-card rounded-xl flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 transition cursor-pointer">
+              <i class="fab fa-linkedin text-xl"></i>
+            </div>
+          </div>
+        </div>
+
+        <form class="space-y-4" onsubmit="event.preventDefault(); alert('✅ پیام شما با موفقیت ارسال شد. به زودی با شما تماس می‌گیریم.');">
+          <div>
+            <label class="block text-white/70 text-sm mb-1">نام و نام خانوادگی</label>
+            <input type="text" placeholder="نام خود را وارد کنید" class="w-full glass-card p-3 rounded-xl text-white placeholder:text-white/30 focus:border-indigo-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-white/70 text-sm mb-1">ایمیل</label>
+            <input type="email" placeholder="ایمیل خود را وارد کنید" class="w-full glass-card p-3 rounded-xl text-white placeholder:text-white/30 focus:border-indigo-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-white/70 text-sm mb-1">شماره تماس</label>
+            <input type="tel" placeholder="شماره تماس خود را وارد کنید" class="w-full glass-card p-3 rounded-xl text-white placeholder:text-white/30 focus:border-indigo-500 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-white/70 text-sm mb-1">پیام شما</label>
+            <textarea rows="3" placeholder="پیام خود را بنویسید..." class="w-full glass-card p-3 rounded-xl text-white placeholder:text-white/30 focus:border-indigo-500 focus:outline-none"></textarea>
+          </div>
+          <button type="submit" class="w-full btn-primary text-white py-3 rounded-xl font-bold text-lg">ارسال پیام</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- فوتر -->
+<footer class="py-12 px-4 border-t border-white/5">
+  <div class="max-w-7xl mx-auto">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center md:text-right">
+      <div>
+        <div class="flex items-center gap-2 mb-4 justify-center md:justify-start">
+          <div class="bg-gradient-to-r from-indigo-600 to-purple-600 p-2 rounded-lg">
+            <i class="fas fa-chalkboard-user text-white"></i>
+          </div>
+          <span class="text-xl font-bold text-white">ناظم‌یار</span>
+        </div>
+        <p class="text-white/40 text-sm">سامانه هوشمند مدیریت آموزشی–تربیتی مدارس</p>
+      </div>
+      <div>
+        <h4 class="text-white font-bold mb-4">دسترسی سریع</h4>
+        <ul class="space-y-2 text-white/40 text-sm">
+          <li><a href="#features" class="hover:text-white transition">مزایا</a></li>
+          <li><a href="#panels" class="hover:text-white transition">پنل‌ها</a></li>
+          <li><a href="#about" class="hover:text-white transition">درباره ما</a></li>
+          <li><a href="#contact" class="hover:text-white transition">تماس</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="text-white font-bold mb-4">پنل‌ها</h4>
+        <ul class="space-y-2 text-white/40 text-sm">
+          <li>مدیر مدرسه</li>
+          <li>ناظم</li>
+          <li>معلم</li>
+          <li>دانش‌آموز</li>
+          <li>اولیا</li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="text-white font-bold mb-4">شبکه‌های اجتماعی</h4>
+        <div class="flex gap-3 justify-center md:justify-start">
+          <div class="w-10 h-10 glass-card rounded-full flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition cursor-pointer">
+            <i class="fab fa-telegram"></i>
+          </div>
+          <div class="w-10 h-10 glass-card rounded-full flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition cursor-pointer">
+            <i class="fab fa-whatsapp"></i>
+          </div>
+          <div class="w-10 h-10 glass-card rounded-full flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition cursor-pointer">
+            <i class="fab fa-instagram"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="border-t border-white/5 mt-8 pt-8 text-center text-white/30 text-sm">
+      طراحی و توسعه: امیر حسین ناظم | تمامی حقوق محفوظ است © ۱۴۰۴
+    </div>
+  </div>
+</footer>
+
+<script>
+    // ========== پارتیکل‌ها ==========
+    function createParticles() {
+        const container = document.getElementById('particles');
+        if (!container) return;
+
+        for (let i = 0; i < 30; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.width = (Math.random() * 4 + 2) + 'px';
+            particle.style.height = particle.style.width;
+            particle.style.animationDuration = (Math.random() * 10 + 5) + 's';
+            particle.style.animationDelay = (Math.random() * 10) + 's';
+            particle.style.opacity = Math.random() * 0.5 + 0.1;
+            container.appendChild(particle);
+        }
+    }
+
+    // ========== منو موبایل ==========
+    document.getElementById('mobileMenuBtn')?.addEventListener('click', () => {
+        const menu = document.getElementById('mobileMenu');
+        menu.classList.toggle('hidden');
+    });
+
+    // ========== اسکرول نرم ==========
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+    });
+
+    // ========== انیمیشن با اسکرول ==========
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry, index) => {
+            if (entry.isIntersecting) {
+                const el = entry.target;
+                el.style.opacity = '1';
+                el.style.transform = 'translateY(0)';
+            }
+        });
+    }, observerOptions);
+
+    document.querySelectorAll('.animate-fade-up').forEach((el, index) => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(50px)';
+        el.style.transition = `all 0.8s ease ${index * 0.1}s`;
+        observer.observe(el);
+    });
+
+    // ========== اجرا ==========
+    createParticles();
+
+    // ========== کنسول لاگ ==========
+    console.log('🚀 ناظم‌یار - سامانه هوشمند مدیریت آموزشی');
+    console.log('👨‍💻 طراحی و توسعه: امیر حسین ناظم');
+    console.log('📧 info@nazemyar.ir');
+</script>
+</body>
+</html>
