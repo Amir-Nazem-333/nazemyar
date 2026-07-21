@@ -1,0 +1,2068 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ناظم‌یار | پنل مدیریت مدرسه</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #0584fc;
+  --primary-dark: #0468d4;
+  --primary-light: #4da3fd;
+  --primary-bg: #e8f4fe;
+  --secondary: #7c3aed;
+  --accent: #f59e0b;
+  --success: #10b981;
+  --danger: #ef4444;
+  --warning: #f59e0b;
+  --info: #0584fc;
+  --bg: #f0f4f8;
+  --surface: #ffffff;
+  --text: #0f172a;
+  --text-secondary: #64748b;
+  --border: #e2e8f0;
+  --shadow: 0 4px 24px rgba(5,132,252,0.08);
+  --radius: 16px;
+  --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+[data-theme="dark"] {
+  --bg: #0f172a;
+  --surface: #1e293b;
+  --text: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --border: #334155;
+  --shadow: 0 4px 24px rgba(0,0,0,0.3);
+  --primary-bg: #1a2a4a;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { font-family: 'Vazirmatn', sans-serif; background: var(--bg); color: var(--text); transition: var(--transition); min-height: 100vh; }
+.num { font-family: 'Vazirmatn', sans-serif; font-variant-numeric: tabular-nums; }
+button { cursor: pointer; font-family: inherit; }
+input, select, textarea { font-family: inherit; }
+
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+[data-theme="dark"] ::-webkit-scrollbar-thumb { background: #475569; }
+
+.app-shell { display: flex; min-height: 100vh; }
+.sidebar { width: 250px; background: linear-gradient(180deg, var(--primary-dark), var(--primary)); color: #fff; position: fixed; top: 0; right: 0; bottom: 0; overflow-y: auto; z-index: 50; transition: transform 0.3s ease; padding-bottom: 2rem; }
+.sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); }
+.sidebar-brand { padding: 1.2rem 1.2rem 0.8rem; border-bottom: 1px solid rgba(255,255,255,0.08); display: flex; align-items: center; gap: 0.7rem; }
+.sidebar-brand .logo { width: 40px; height: 40px; border-radius: 10px; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; color: #fff; }
+.sidebar-brand .title { font-size: 1.1rem; font-weight: 800; }
+.sidebar-brand .sub { font-size: 0.6rem; opacity: 0.5; }
+.sidebar-group { padding: 1rem 1.2rem 0.2rem; font-size: 0.55rem; color: rgba(255,255,255,0.3); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; }
+.sidebar-link { display: flex; align-items: center; gap: 0.7rem; padding: 0.55rem 1.2rem; color: rgba(255,255,255,0.65); font-weight: 500; font-size: 0.82rem; border-right: 3px solid transparent; transition: var(--transition); cursor: pointer; width: 100%; text-align: right; background: none; border: none; }
+.sidebar-link:hover { background: rgba(255,255,255,0.08); color: #fff; }
+.sidebar-link.active { background: rgba(255,255,255,0.1); color: #fff; border-color: #fff; }
+.sidebar-link i { width: 18px; text-align: center; font-size: 0.9rem; }
+.sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 45; }
+.sidebar-overlay.show { display: block; }
+.main-content { flex: 1; margin-right: 250px; padding: 1.2rem 1.5rem 2.5rem; max-width: 100%; }
+@media (max-width: 1100px) { .sidebar { transform: translateX(100%); } .sidebar.open { transform: translateX(0); } .main-content { margin-right: 0; padding: 0.8rem; } }
+
+.topbar { display: flex; justify-content: space-between; align-items: center; background: var(--surface); border-radius: var(--radius); padding: 0.6rem 1.2rem; box-shadow: var(--shadow); border: 1px solid var(--border); margin-bottom: 1.2rem; flex-wrap: wrap; gap: 0.5rem; }
+.topbar-left { display: flex; align-items: center; gap: 0.7rem; }
+.topbar-title { font-size: 1.1rem; font-weight: 800; }
+.topbar-sub { font-size: 0.7rem; color: var(--text-secondary); }
+.topbar-right { display: flex; align-items: center; gap: 0.5rem; }
+.theme-toggle { width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--border); background: var(--surface); color: var(--text); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--transition); font-size: 0.9rem; }
+.theme-toggle:hover { background: var(--bg); }
+.user-badge { display: flex; align-items: center; gap: 0.5rem; padding: 0.3rem 0.9rem; border-radius: 999px; border: 1px solid var(--border); background: var(--surface); font-weight: 700; font-size: 0.8rem; }
+.user-badge i { color: var(--primary); }
+
+.card { background: var(--surface); border-radius: var(--radius); padding: 1.2rem; box-shadow: var(--shadow); border: 1px solid var(--border); transition: var(--transition); }
+.card:hover { box-shadow: 0 8px 30px rgba(5,132,252,0.1); }
+.card-title { font-weight: 800; font-size: 0.95rem; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.8rem; color: var(--text); }
+.card-title i { color: var(--primary); }
+
+.stat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 0.8rem; margin-bottom: 1.2rem; }
+.stat-card { background: var(--surface); border-radius: var(--radius); padding: 0.9rem 1rem; border: 1px solid var(--border); display: flex; align-items: center; gap: 0.7rem; transition: var(--transition); box-shadow: var(--shadow); }
+.stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(5,132,252,0.12); }
+.stat-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; background: var(--primary-bg); color: var(--primary); }
+.stat-label { font-size: 0.6rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.03em; }
+.stat-value { font-size: 1.2rem; font-weight: 800; }
+
+.btn { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.45rem 1rem; border-radius: 8px; font-weight: 700; font-size: 0.78rem; border: none; cursor: pointer; transition: var(--transition); }
+.btn:active { transform: scale(0.96); }
+.btn-primary { background: var(--primary); color: #fff; }
+.btn-primary:hover { background: var(--primary-dark); }
+.btn-success { background: var(--success); color: #fff; }
+.btn-success:hover { background: #059669; }
+.btn-danger { background: var(--danger); color: #fff; }
+.btn-danger:hover { background: #dc2626; }
+.btn-warning { background: var(--warning); color: #fff; }
+.btn-warning:hover { background: #d97706; }
+.btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
+.btn-outline:hover { background: var(--bg); }
+.btn-sm { padding: 0.25rem 0.7rem; font-size: 0.65rem; }
+.btn-ghost { background: transparent; color: var(--text-secondary); padding: 0.2rem 0.5rem; }
+.btn-ghost:hover { background: var(--bg); border-radius: 6px; }
+
+.badge { padding: 0.15rem 0.6rem; border-radius: 999px; font-size: 0.6rem; font-weight: 700; display: inline-flex; align-items: center; gap: 0.2rem; }
+.badge-success { background: #d1fae5; color: #065f46; }
+.badge-danger { background: #fee2e2; color: #991b1b; }
+.badge-warning { background: #fef3c7; color: #92400e; }
+.badge-info { background: var(--primary-bg); color: var(--primary); }
+.badge-purple { background: #ede9fe; color: #5b21b6; }
+.badge-gray { background: #f1f5f9; color: #475569; }
+[data-theme="dark"] .badge-success { background: #064e3b; color: #6ee7b7; }
+[data-theme="dark"] .badge-danger { background: #7f1d1d; color: #fca5a5; }
+[data-theme="dark"] .badge-warning { background: #78350f; color: #fcd34d; }
+[data-theme="dark"] .badge-info { background: #1a2a4a; color: #4da3fd; }
+[data-theme="dark"] .badge-purple { background: #4c1d95; color: #c4b5fd; }
+[data-theme="dark"] .badge-gray { background: #334155; color: #94a3b8; }
+
+input, select, textarea { background: var(--bg); border: 1.5px solid var(--border); color: var(--text); padding: 0.5rem 0.8rem; border-radius: 8px; width: 100%; font-size: 0.8rem; transition: var(--transition); }
+input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(5,132,252,0.15); }
+label { font-size: 0.7rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 0.2rem; display: block; }
+
+.table-wrap { border-radius: var(--radius); overflow: auto; border: 1px solid var(--border); }
+table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+thead th { background: var(--bg); color: var(--text-secondary); font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.04em; padding: 0.6rem 0.8rem; border-bottom: 2px solid var(--border); text-align: right; position: sticky; top: 0; z-index: 5; white-space: nowrap; }
+tbody td { padding: 0.6rem 0.8rem; border-bottom: 1px solid var(--border); vertical-align: middle; text-align: right; }
+tbody tr:hover td { background: var(--bg); }
+
+.search-box { position: relative; }
+.search-box input { padding-right: 2.2rem; }
+.search-box i { position: absolute; right: 0.7rem; top: 50%; transform: translateY(-50%); color: var(--text-secondary); font-size: 0.85rem; }
+
+.progress-track { background: var(--border); border-radius: 999px; height: 5px; overflow: hidden; }
+.progress-fill { height: 100%; border-radius: 999px; transition: width 0.4s; background: var(--primary); }
+
+.toast { position: fixed; bottom: 20px; left: 20px; padding: 10px 20px; border-radius: 50px; color: #fff; font-weight: 600; font-size: 0.8rem; box-shadow: 0 8px 30px rgba(0,0,0,0.15); z-index: 9999; animation: slideIn 0.35s ease; }
+.toast-success { background: var(--success); }
+.toast-error { background: var(--danger); }
+@keyframes slideIn { from { transform: translateX(-120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(3px); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 1rem; animation: fadeIn 0.2s ease; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.modal-content { background: var(--surface); border-radius: var(--radius); padding: 1.5rem; max-width: 650px; width: 100%; max-height: 85vh; overflow-y: auto; animation: scaleUp 0.25s ease; }
+@keyframes scaleUp { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+.tab-content { animation: fadeUp 0.3s ease; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+.hidden { display: none !important; }
+
+.scrollable { max-height: 400px; overflow-y: auto; }
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
+@media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
+
+/* وضعیت رضایت‌نامه */
+.consent-status {
+  padding: 3px 12px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  display: inline-block;
+  white-space: nowrap;
+}
+.consent-status.approved { background: #d1fae5; color: #065f46; }
+.consent-status.rejected { background: #fee2e2; color: #991b1b; }
+.consent-status.pending { background: #fef3c7; color: #92400e; }
+.consent-status.expired { background: #e5e7eb; color: #4b5563; }
+
+.signature-pad-canvas {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  background: #fff;
+  touch-action: none;
+  cursor: crosshair;
+  width: 100%;
+  max-width: 480px;
+  height: 150px;
+}
+[data-theme="dark"] .signature-pad-canvas { background: #1e293b; }
+</style>
+</head>
+<body>
+
+<div id="adminShell" class="app-shell">
+  <div id="sidebarOverlay" class="sidebar-overlay"></div>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="logo"><i class="fas fa-chalkboard-user"></i></div>
+      <div><div class="title">ناظم‌یار</div><div class="sub">سامانه مدیریت مدرسه</div></div>
+    </div>
+    <div class="sidebar-group">کلی</div>
+    <button data-tab="dashboard" class="sidebar-link active"><i class="fas fa-gauge-high"></i> داشبورد</button>
+    <div class="sidebar-group">ساختار</div>
+    <button data-tab="classes" class="sidebar-link"><i class="fas fa-school"></i> کلاس‌ها</button>
+    <button data-tab="students" class="sidebar-link"><i class="fas fa-user-graduate"></i> دانش‌آموزان</button>
+    <button data-tab="teachers" class="sidebar-link"><i class="fas fa-chalkboard-user"></i> معلمان</button>
+    <button data-tab="supervisors" class="sidebar-link"><i class="fas fa-user-shield"></i> ناظمین</button>
+    <button data-tab="hierarchy" class="sidebar-link"><i class="fas fa-sitemap"></i> سلسله مراتب</button>
+    <div class="sidebar-group">مالی</div>
+    <button data-tab="accounting" class="sidebar-link"><i class="fas fa-coins"></i> حسابداری</button>
+    <button data-tab="tuition" class="sidebar-link"><i class="fas fa-hand-holding-dollar"></i> شهریه</button>
+    <div class="sidebar-group">گزارشات</div>
+    <button data-tab="consent" class="sidebar-link"><i class="fas fa-file-signature"></i> رضایت‌نامه</button>
+    <button data-tab="reports" class="sidebar-link"><i class="fas fa-chart-pie"></i> گزارشات</button>
+  </aside>
+
+  <div class="main-content">
+    <div class="topbar">
+      <div class="topbar-left">
+        <button id="sidebarToggle" class="btn btn-ghost" style="display:none;border:1px solid var(--border);border-radius:8px;padding:0.3rem 0.6rem;"><i class="fas fa-bars"></i></button>
+        <div><h1 class="topbar-title" id="pageTitle">داشبورد</h1><p class="topbar-sub" id="pageSub">خلاصه وضعیت کلی مدرسه</p></div>
+      </div>
+      <div class="topbar-right">
+        <button id="themeToggle" class="theme-toggle"><i class="fas fa-moon"></i></button>
+        <div class="user-badge"><i class="fas fa-user-tie"></i> مدیر</div>
+      </div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div id="dashboardTab" class="tab-content">
+      <div class="stat-grid">
+        <div class="stat-card"><div class="stat-icon"><i class="fas fa-user-graduate"></i></div><div><p class="stat-label">دانش‌آموزان</p><p id="statStudents" class="stat-value">0</p></div></div>
+        <div class="stat-card"><div class="stat-icon"><i class="fas fa-chalkboard-user"></i></div><div><p class="stat-label">معلمان</p><p id="statTeachers" class="stat-value">0</p></div></div>
+        <div class="stat-card"><div class="stat-icon"><i class="fas fa-user-shield"></i></div><div><p class="stat-label">ناظمین</p><p id="statSupervisors" class="stat-value">0</p></div></div>
+        <div class="stat-card"><div class="stat-icon"><i class="fas fa-door-open"></i></div><div><p class="stat-label">کلاس‌ها</p><p id="statClasses" class="stat-value">0</p></div></div>
+        <div class="stat-card"><div class="stat-icon"><i class="fas fa-star"></i></div><div><p class="stat-label">میانگین نمرات</p><p id="statAvg" class="stat-value">0</p></div></div>
+        <div class="stat-card"><div class="stat-icon"><i class="fas fa-wallet"></i></div><div><p class="stat-label">مانده صندوق</p><p id="statBalance" class="stat-value">0</p></div></div>
+      </div>
+      <div class="grid-2">
+        <div class="card"><h3 class="card-title"><i class="fas fa-chart-bar"></i> توزیع دانش‌آموزان</h3><canvas id="studentsPerClassChart" height="180"></canvas></div>
+        <div class="card"><h3 class="card-title"><i class="fas fa-chart-pie"></i> معلمان و ناظمین</h3><canvas id="teachersVsSupervisorsChart" height="180"></canvas></div>
+      </div>
+    </div>
+
+    <!-- CLASSES -->
+    <div id="classesTab" class="tab-content hidden">
+      <div class="grid-2">
+        <div class="card"><h3 class="card-title"><i class="fas fa-plus-circle" style="color:var(--warning);"></i> ایجاد کلاس</h3>
+          <div style="display:flex;gap:0.5rem;"><input type="text" id="className" placeholder="نام کلاس" style="flex:1;"><button id="addClassBtn" class="btn btn-warning">ایجاد</button></div>
+          <div class="scrollable" style="margin-top:0.8rem;"><ul id="classesList" style="list-style:none;"></ul></div>
+        </div>
+        <div class="card"><h3 class="card-title"><i class="fas fa-book" style="color:var(--primary);"></i> افزودن درس</h3>
+          <select id="selectClassForCourse" style="margin-bottom:0.5rem;"><option value="">انتخاب کلاس</option></select>
+          <div style="display:flex;gap:0.5rem;"><input type="text" id="courseName" placeholder="نام درس" style="flex:1;"><button id="addCourseBtn" class="btn btn-primary">افزودن</button></div>
+          <div class="scrollable" style="margin-top:0.8rem;"><ul id="coursesOfClassesList" style="list-style:none;"></ul></div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:1.2rem;"><h3 class="card-title"><i class="fas fa-user-check" style="color:var(--success);"></i> تخصیص معلم</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.5rem;"><select id="selectClassForTeacher"><option value="">کلاس</option></select><select id="selectCourseForTeacher"><option value="">درس</option></select><select id="selectTeacherForAssign"><option value="">معلم</option></select></div>
+        <button id="assignTeacherBtn" class="btn btn-success" style="width:100%;margin-top:0.5rem;">✅ تخصیص</button>
+        <div id="teacherAssignmentsList" style="margin-top:0.8rem;"></div>
+      </div>
+    </div>
+
+    <!-- STUDENTS -->
+    <div id="studentsTab" class="tab-content hidden">
+      <div class="card" style="margin-bottom:1.2rem;"><h3 class="card-title"><i class="fas fa-user-plus" style="color:var(--success);"></i> ثبت دانش‌آموز</h3>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem;margin-bottom:0.5rem;">
+          <input type="text" id="stdFullname" placeholder="نام و نام خانوادگی">
+          <input type="text" id="stdNationalCode" placeholder="کد ملی">
+          <input type="text" id="stdBirthYear" placeholder="سال تولد">
+          <input type="text" id="stdAddress" placeholder="آدرس">
+          <input type="text" id="stdPhone" placeholder="تلفن دانش‌آموز">
+          <input type="text" id="stdParentPhone" placeholder="تلفن والدین">
+          <select id="stdClassSelect"><option value="">انتخاب کلاس</option></select>
+          <input type="text" id="stdPassword" placeholder="رمز عبور" value="123456">
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:0.5rem;"><button id="addStudentBtn" class="btn btn-primary"><i class="fas fa-plus"></i> ثبت</button><button id="importExcelBtn" class="btn btn-success"><i class="fas fa-file-excel"></i> ورود اکسل</button><input type="file" id="excelFileInput" accept=".xlsx,.xls,.csv" style="display:none;"><label for="excelFileInput" class="btn btn-outline" style="cursor:pointer;"><i class="fas fa-upload"></i> انتخاب فایل</label></div>
+      </div>
+      <div class="card"><div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.5rem;"><div class="search-box" style="flex:1;min-width:150px;"><i class="fas fa-search"></i><input type="text" id="searchStudent" placeholder="جستجو..."></div><select id="sortStudentsBy" style="width:150px;"><option value="name">مرتب‌سازی: نام</option><option value="class">مرتب‌سازی: کلاس</option><option value="code">مرتب‌سازی: کد ملی</option></select><select id="filterClass" style="width:150px;"><option value="">همه کلاس‌ها</option></select></div>
+        <h3 class="card-title"><i class="fas fa-list"></i> لیست دانش‌آموزان</h3>
+        <div class="table-wrap scrollable"><table><thead><tr><th>نام</th><th>کد ملی</th><th>کلاس</th><th>معدل</th><th>انضباط</th><th>شهریه</th><th>عملیات</th></tr></thead><tbody id="studentsListTable"></tbody></table></div>
+      </div>
+    </div>
+
+    <!-- TEACHERS -->
+    <div id="teachersTab" class="tab-content hidden">
+      <div class="card" style="margin-bottom:1.2rem;"><h3 class="card-title"><i class="fas fa-chalkboard-user" style="color:var(--primary);"></i> ثبت معلم</h3>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.5rem;margin-bottom:0.5rem;"><input type="text" id="teacherName" placeholder="نام معلم"><input type="text" id="teacherCode" placeholder="کد پرسنلی"><input type="text" id="teacherPhone" placeholder="تلفن"><input type="password" id="teacherPassword" placeholder="رمز عبور" value="teacher123"></div>
+        <button id="addTeacherBtn" class="btn btn-primary">ثبت معلم</button>
+      </div>
+      <div class="card"><div class="search-box" style="margin-bottom:0.5rem;"><i class="fas fa-search"></i><input type="text" id="searchTeacher" placeholder="جستجوی معلم..."></div>
+        <h3 class="card-title"><i class="fas fa-list"></i> لیست معلمان</h3>
+        <div class="table-wrap scrollable"><table><thead><tr><th>نام</th><th>کد</th><th>تلفن</th><th>دروس</th><th>میانگین</th><th>عملیات</th></tr></thead><tbody id="teachersListTable"></tbody></table></div>
+      </div>
+    </div>
+
+    <!-- SUPERVISORS -->
+    <div id="supervisorsTab" class="tab-content hidden">
+      <div class="card" style="margin-bottom:1.2rem;"><h3 class="card-title"><i class="fas fa-user-shield" style="color:var(--secondary);"></i> ثبت ناظم</h3>
+        <p style="font-size:0.75rem;color:var(--text-secondary);margin-bottom:0.5rem;">📌 ناظم به تمام کلاس‌ها و دانش‌آموزان دسترسی دارد</p>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.5rem;margin-bottom:0.5rem;"><input type="text" id="supName" placeholder="نام ناظم"><input type="text" id="supCode" placeholder="کد پرسنلی"><input type="text" id="supPhone" placeholder="تلفن"><input type="password" id="supPassword" placeholder="رمز عبور" value="nazem123"></div>
+        <button id="addSupervisorBtn" class="btn btn-primary">ثبت ناظم</button>
+      </div>
+      <div class="card"><div class="search-box" style="margin-bottom:0.5rem;"><i class="fas fa-search"></i><input type="text" id="searchSupervisor" placeholder="جستجوی ناظم..."></div>
+        <h3 class="card-title"><i class="fas fa-list"></i> لیست ناظمین</h3>
+        <div class="table-wrap scrollable"><table><thead><tr><th>نام</th><th>کد</th><th>تلفن</th><th>عملیات</th></tr></thead><tbody id="supervisorsListTable"></tbody></table></div>
+      </div>
+    </div>
+
+    <!-- ACCOUNTING -->
+    <div id="accountingTab" class="tab-content hidden">
+      <div class="stat-grid">
+        <div class="stat-card" style="border-right:4px solid var(--success);"><div class="stat-icon" style="background:#d1fae5;color:var(--success);"><i class="fas fa-arrow-up"></i></div><div><p class="stat-label">درآمد کل</p><p id="accIncome" class="stat-value" style="color:var(--success);">0</p></div></div>
+        <div class="stat-card" style="border-right:4px solid var(--danger);"><div class="stat-icon" style="background:#fee2e2;color:var(--danger);"><i class="fas fa-arrow-down"></i></div><div><p class="stat-label">هزینه کل</p><p id="accExpense" class="stat-value" style="color:var(--danger);">0</p></div></div>
+        <div class="stat-card" style="border-right:4px solid var(--primary);"><div class="stat-icon" style="background:var(--primary-bg);color:var(--primary);"><i class="fas fa-scale-balanced"></i></div><div><p class="stat-label">مانده</p><p id="accBalance" class="stat-value">0</p></div></div>
+        <div class="stat-card" style="border-right:4px solid var(--secondary);"><div class="stat-icon" style="background:#ede9fe;color:var(--secondary);"><i class="fas fa-receipt"></i></div><div><p class="stat-label">تعداد تراکنش</p><p id="accCount" class="stat-value">0</p></div></div>
+      </div>
+      <div class="card" style="margin-bottom:1.2rem;">
+        <h3 class="card-title"><i class="fas fa-plus-circle" style="color:var(--success);"></i> تراکنش جدید</h3>
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:0.5rem;margin-bottom:0.5rem;">
+          <select id="txType"><option value="income">درآمد</option><option value="expense">هزینه</option></select>
+          <select id="txCategory"><option value="">انتخاب دسته</option></select>
+          <input type="number" id="txAmount" placeholder="مبلغ">
+          <input type="text" id="txDate" placeholder="تاریخ (مثال: ۱۴۰۴/۰۵/۱۵)">
+          <input type="text" id="txDesc" placeholder="توضیحات">
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:0.5rem;">
+          <button id="addTxBtn" class="btn btn-success"><i class="fas fa-check"></i> ثبت تراکنش</button>
+          <div style="display:flex;gap:0.3rem;align-items:center;">
+            <input type="text" id="newCategoryName" placeholder="دسته جدید" style="width:160px;">
+            <button id="addCategoryBtn" class="btn btn-outline btn-sm">+ افزودن</button>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.5rem;align-items:center;">
+          <div class="search-box" style="flex:1;min-width:150px;"><i class="fas fa-search"></i><input type="text" id="searchTx" placeholder="جستجو..."></div>
+          <select id="filterTxType" style="width:120px;"><option value="">همه</option><option value="income">درآمد</option><option value="expense">هزینه</option></select>
+          <select id="filterTxCategory" style="width:150px;"><option value="">همه دسته‌ها</option></select>
+          <button id="exportTxExcelBtn" class="btn btn-success btn-sm"><i class="fas fa-file-excel"></i> خروجی اکسل</button>
+        </div>
+        <div class="table-wrap scrollable" style="max-height:420px;">
+          <table><thead><tr><th>نوع</th><th>دسته</th><th>مبلغ</th><th>توضیحات</th><th>تاریخ</th><th>عملیات</th></tr></thead><tbody id="txTable"></tbody></table>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:0.5rem;flex-wrap:wrap;gap:0.3rem;">
+          <span style="font-size:0.7rem;color:var(--text-secondary);">تعداد: <span id="txShownCount">0</span></span>
+          <span style="font-size:0.7rem;color:var(--text-secondary);">🟢 درآمد | 🔴 هزینه</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TUITION -->
+    <div id="tuitionTab" class="tab-content hidden">
+      <div class="stat-grid">
+        <div class="stat-card" style="border-right:4px solid var(--primary);"><div class="stat-icon" style="background:var(--primary-bg);color:var(--primary);"><i class="fas fa-coins"></i></div><div><p class="stat-label">کل شهریه</p><p id="tuiTotal" class="stat-value">0</p></div></div>
+        <div class="stat-card" style="border-right:4px solid var(--success);"><div class="stat-icon" style="background:#d1fae5;color:var(--success);"><i class="fas fa-hand-holding-dollar"></i></div><div><p class="stat-label">دریافتی</p><p id="tuiPaid" class="stat-value" style="color:var(--success);">0</p></div></div>
+        <div class="stat-card" style="border-right:4px solid var(--danger);"><div class="stat-icon" style="background:#fee2e2;color:var(--danger);"><i class="fas fa-triangle-exclamation"></i></div><div><p class="stat-label">مانده</p><p id="tuiRemaining" class="stat-value" style="color:var(--danger);">0</p></div></div>
+        <div class="stat-card" style="border-right:4px solid var(--secondary);"><div class="stat-icon" style="background:#ede9fe;color:var(--secondary);"><i class="fas fa-user-clock"></i></div><div><p class="stat-label">بدهکاران</p><p id="tuiDebtors" class="stat-value" style="color:var(--secondary);">0</p></div></div>
+      </div>
+      <div class="card" style="margin-bottom:1.2rem;">
+        <div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.8rem;align-items:center;">
+          <div class="search-box" style="flex:1;min-width:150px;"><i class="fas fa-search"></i><input type="text" id="searchTui" placeholder="جستجوی دانش‌آموز..." style="padding-right:2.2rem;"></div>
+          <select id="filterTuiClass" style="width:150px;"><option value="">همه کلاس‌ها</option></select>
+          <select id="filterTuiStatus" style="width:150px;">
+            <option value="">همه وضعیت‌ها</option>
+            <option value="تسویه‌شده">✅ تسویه‌شده</option>
+            <option value="معوقه">❌ معوقه</option>
+            <option value="پرداخت جزئی">⏳ پرداخت جزئی</option>
+            <option value="تعیین‌نشده">⚪ تعیین‌نشده</option>
+          </select>
+          <button id="exportTuitionExcelBtn" class="btn btn-success btn-sm"><i class="fas fa-file-excel"></i> خروجی اکسل</button>
+        </div>
+        <div class="table-wrap scrollable" style="max-height:420px;">
+          <table><thead><tr><th>نام</th><th>کلاس</th><th>کل شهریه</th><th>تخفیف</th><th>پرداخت</th><th>مانده</th><th>وضعیت</th><th>عملیات</th></tr></thead><tbody id="tuitionTable"></tbody></table>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:0.5rem;flex-wrap:wrap;gap:0.3rem;">
+          <span style="font-size:0.7rem;color:var(--text-secondary);">تعداد: <span id="tuiCount">0</span> دانش‌آموز</span>
+          <span style="font-size:0.7rem;color:var(--text-secondary);">🟢 تسویه‌شده | 🟡 پرداخت جزئی | 🔴 معوقه</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== CONSENT - کاملاً بازطراحی‌شده ===== -->
+    <div id="consentTab" class="tab-content hidden">
+      <div class="stat-grid">
+        <div class="stat-card" style="border-right:4px solid var(--primary);">
+          <div class="stat-icon" style="background:var(--primary-bg);color:var(--primary);"><i class="fas fa-file-signature"></i></div>
+          <div><p class="stat-label">کل رضایت‌نامه‌ها</p><p id="consentTotal" class="stat-value">0</p></div>
+        </div>
+        <div class="stat-card" style="border-right:4px solid var(--success);">
+          <div class="stat-icon" style="background:#d1fae5;color:var(--success);"><i class="fas fa-check-circle"></i></div>
+          <div><p class="stat-label">تایید شده</p><p id="consentApproved" class="stat-value" style="color:var(--success);">0</p></div>
+        </div>
+        <div class="stat-card" style="border-right:4px solid var(--danger);">
+          <div class="stat-icon" style="background:#fee2e2;color:var(--danger);"><i class="fas fa-times-circle"></i></div>
+          <div><p class="stat-label">رد شده</p><p id="consentRejected" class="stat-value" style="color:var(--danger);">0</p></div>
+        </div>
+        <div class="stat-card" style="border-right:4px solid var(--warning);">
+          <div class="stat-icon" style="background:#fef3c7;color:var(--warning);"><i class="fas fa-hourglass-half"></i></div>
+          <div><p class="stat-label">در انتظار</p><p id="consentPending" class="stat-value" style="color:var(--warning);">0</p></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:1.2rem;">
+        <h3 class="card-title"><i class="fas fa-plus-circle" style="color:var(--warning);"></i> ایجاد رضایت‌نامه جدید</h3>
+        <p style="font-size:0.75rem;color:var(--text-secondary);margin-bottom:0.5rem;">برای اردو، بازدید علمی، انتشار تصاویر یا هر مورد دیگر</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-bottom:0.5rem;">
+          <div><label>عنوان رضایت‌نامه</label><input type="text" id="consentTitle" placeholder="مثال: اردوی علمی کویر مصر" style="width:100%;"></div>
+          <div><label>مهلت پاسخ‌گویی</label><input type="text" id="consentDeadline" placeholder="مثال: ۱۴۰۴/۰۵/۱۵" style="width:100%;"></div>
+          <div><label>مخاطبین</label>
+            <select id="consentTargetType" style="width:100%;">
+              <option value="all">همه دانش‌آموزان</option>
+              <option value="class">یک کلاس خاص</option>
+              <option value="selected">انتخاب دانش‌آموزان</option>
+            </select>
+          </div>
+          <div id="consentClassWrap" style="display:none;">
+            <label>انتخاب کلاس</label>
+            <select id="consentTargetClass" style="width:100%;"><option value="">انتخاب کلاس</option></select>
+          </div>
+          <div id="consentSelectedWrap" style="display:none;grid-column:span 2;">
+            <label>انتخاب دانش‌آموزان (با Ctrl/Cmd کلیک کنید)</label>
+            <select id="consentSelectedStudents" multiple style="width:100%;height:100px;padding:0.3rem;">
+              <option value="">دانش‌آموزی یافت نشد</option>
+            </select>
+            <span style="font-size:0.65rem;color:var(--text-secondary);">برای انتخاب چند دانش‌آموز، کلید Ctrl (ویندوز) یا Cmd (مک) را نگه دارید</span>
+          </div>
+        </div>
+        <div style="margin-bottom:0.5rem;">
+          <label>متن رضایت‌نامه</label>
+          <textarea id="consentText" rows="3" style="width:100%;">اینجانب ولیّ دانش‌آموز، پس از مطالعه کامل جزئیات برنامه فوق، رضایت آگاهانه خود را برای شرکت فرزندم اعلام می‌نمایم و مسئولیت هرگونه حادثه خارج از تقصیر مدرسه را می‌پذیرم.</textarea>
+        </div>
+        <button id="createConsentBtn" class="btn btn-warning"><i class="fas fa-plus"></i> ایجاد رضایت‌نامه</button>
+      </div>
+
+      <div id="consentFormsList" style="space-y:0.8rem;"></div>
+    </div>
+
+    <!-- REPORTS -->
+    <div id="reportsTab" class="tab-content hidden">
+      <div class="grid-2">
+        <div class="card"><h3 class="card-title"><i class="fas fa-file-alt" style="color:var(--success);"></i> کارنامه</h3>
+          <div class="search-box" style="margin-bottom:0.5rem;"><i class="fas fa-search"></i><input type="text" id="searchStudentCard" placeholder="جستجو..."></div>
+          <select id="cardStudentSelect" style="margin-bottom:0.5rem;"><option value="">انتخاب دانش‌آموز</option></select>
+          <div id="studentCard" style="padding:0.8rem;border-radius:10px;background:var(--bg);min-height:60px;"></div>
+        </div>
+        <div class="card"><h3 class="card-title"><i class="fas fa-chart-pie" style="color:var(--secondary);"></i> آمار کلی</h3>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-bottom:0.5rem;"><div style="padding:0.5rem;border-radius:8px;text-align:center;background:var(--primary-bg);"><span style="font-weight:700;font-size:0.7rem;">میانگین نمرات</span><br><span id="schoolAvgGrade" style="font-size:1.2rem;font-weight:800;color:var(--primary);">0</span></div><div style="padding:0.5rem;border-radius:8px;text-align:center;background:#d1fae5;"><span style="font-weight:700;font-size:0.7rem;">حضور کلی</span><br><span id="schoolAttendanceRate" style="font-size:1.2rem;font-weight:800;color:var(--success);">0%</span></div><div style="padding:0.5rem;border-radius:8px;text-align:center;background:#fef3c7;"><span style="font-weight:700;font-size:0.7rem;">کل نمرات</span><br><span id="totalGradesCount" style="font-size:1.2rem;font-weight:800;color:var(--warning);">0</span></div><div style="padding:0.5rem;border-radius:8px;text-align:center;background:#fee2e2;"><span style="font-weight:700;font-size:0.7rem;">تخلفات</span><br><span id="totalViolations" style="font-size:1.2rem;font-weight:800;color:var(--danger);">0</span></div></div>
+          <canvas id="schoolStatsChart" height="120"></canvas>
+        </div>
+      </div>
+      <div class="ai-insight-card" style="margin:1.2rem 0;"><h3 style="font-weight:700;font-size:1.1rem;margin-bottom:0.5rem;"><i class="fas fa-robot"></i> 🤖 تحلیل هوشمند</h3>
+        <div id="aiInsights"><div style="background:rgba(255,255,255,0.08);padding:0.6rem;border-radius:10px;margin-bottom:0.5rem;"><span style="font-weight:700;">📊 خلاصه:</span> <span id="aiSummary">در حال تحلیل...</span></div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.5rem;"><div style="background:rgba(255,255,255,0.08);padding:0.5rem;border-radius:10px;"><span style="font-weight:700;font-size:0.75rem;">🎯 پیشنهادات</span><p id="aiSuggestions" style="font-size:0.7rem;opacity:0.8;">...</p></div><div style="background:rgba(255,255,255,0.08);padding:0.5rem;border-radius:10px;"><span style="font-weight:700;font-size:0.75rem;">📈 روند</span><p id="aiTrends" style="font-size:0.7rem;opacity:0.8;">...</p></div><div style="background:rgba(255,255,255,0.08);padding:0.5rem;border-radius:10px;"><span style="font-weight:700;font-size:0.75rem;">⚠️ هشدارها</span><p id="aiAlerts" style="font-size:0.7rem;opacity:0.8;">...</p></div></div></div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:1.2rem;"><button id="exportFullSchoolExcelBtn" class="btn btn-success"><i class="fas fa-file-excel"></i> خروجی اکسل جامع</button></div>
+      <div class="card" style="margin-bottom:1.2rem;"><h3 class="card-title"><i class="fas fa-chalkboard-user" style="color:var(--primary);"></i> نمرات معلمان</h3>
+        <div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.5rem;"><div class="search-box" style="flex:1;min-width:150px;"><i class="fas fa-search"></i><input type="text" id="searchTeacherGrades" placeholder="جستجو..."></div><select id="filterTeacherClass" style="width:150px;"><option value="">همه کلاس‌ها</option></select><select id="filterTeacherName" style="width:150px;"><option value="">همه معلمان</option></select><button id="exportGradesDataBtn" class="btn btn-success btn-sm"><i class="fas fa-file-excel"></i> خروجی</button></div>
+        <div class="table-wrap scrollable"><table><thead><tr><th>معلم</th><th>دانش‌آموز</th><th>کلاس</th><th>درس</th><th>نوع</th><th>عنوان</th><th>نمره</th><th>تاریخ</th></tr></thead><tbody id="teacherGradesTable"></tbody></table></div>
+        <div style="text-align:center;font-size:0.7rem;color:var(--text-secondary);margin-top:0.5rem;">مجموع: <span id="teacherGradesCount">0</span></div>
+      </div>
+      <div class="card" style="margin-bottom:1.2rem;"><h3 class="card-title"><i class="fas fa-tasks" style="color:var(--warning);"></i> تکالیف</h3>
+        <div class="search-box" style="margin-bottom:0.5rem;"><i class="fas fa-search"></i><input type="text" id="searchHomework" placeholder="جستجو..."></div>
+        <div class="table-wrap scrollable"><table><thead><tr><th>معلم</th><th>کلاس</th><th>درس</th><th>عنوان</th><th>توضیحات</th><th>مهلت</th><th>تاریخ</th></tr></thead><tbody id="teacherHomeworksTable"></tbody></table></div>
+      </div>
+      <div class="card" style="margin-bottom:1.2rem;"><h3 class="card-title"><i class="fas fa-clipboard-list" style="color:var(--info);"></i> حضور و غیاب</h3>
+        <div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.5rem;"><div class="search-box" style="flex:1;min-width:150px;"><i class="fas fa-search"></i><input type="text" id="searchTeacherAttendance" placeholder="جستجو..."></div><select id="filterAttendanceType" style="width:150px;"><option value="">همه</option><option value="present">حاضر</option><option value="absent">غایب</option><option value="late">تأخیر</option><option value="excused">غیبت موجه</option></select></div>
+        <div class="table-wrap scrollable"><table><thead><tr><th>ثبت‌کننده</th><th>دانش‌آموز</th><th>کلاس</th><th>وضعیت</th><th>تاریخ</th><th>توضیحات</th></tr></thead><tbody id="teacherAttendanceTable"></tbody></table></div>
+      </div>
+      <div class="card"><h3 class="card-title"><i class="fas fa-shield-alt" style="color:var(--secondary);"></i> گزارشات انضباطی</h3>
+        <div class="search-box" style="margin-bottom:0.5rem;"><i class="fas fa-search"></i><input type="text" id="searchReport" placeholder="جستجو..."></div>
+        <div class="table-wrap scrollable"><table><thead><tr><th>دانش‌آموز</th><th>کلاس</th><th>نوع</th><th>تاریخ</th><th>توضیحات</th><th>ثبت‌کننده</th></tr></thead><tbody id="allReportsTable"></tbody></table></div>
+      </div>
+    </div>
+
+    <!-- HIERARCHY -->
+    <div id="hierarchyTab" class="tab-content hidden">
+      <div class="card"><div class="search-box" style="margin-bottom:0.5rem;"><i class="fas fa-search"></i><input type="text" id="searchHierarchy" placeholder="جستجو در کلاس‌ها..."></div>
+        <h3 class="card-title"><i class="fas fa-sitemap" style="color:var(--primary);"></i> ساختار مدرسه</h3>
+        <div id="hierarchyTree" class="scrollable" style="max-height:500px;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// DATA LAYER
+// ============================================================
+let appData = {
+  classes: [],
+  students: [],
+  teachers: [],
+  supervisors: [],
+  reports: [],
+  grades: [],
+  homeworks: [],
+  transactions: [],
+  tuitions: [],
+  consentForms: [],
+  consentResponses: [],
+  categories: {
+    income: ['شهریه', 'کمک اولیا', 'فروش کتاب', 'سایر درآمدها'],
+    expense: ['حقوق', 'تعمیرات', 'تجهیزات', 'قبوض', 'اردو', 'پذیرایی', 'اجاره', 'سایر هزینه‌ها']
+  }
+};
+
+// ============================================================
+// UTILITY
+// ============================================================
+function uid(p) { return p + '_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6); }
+function toFa(n) { return Number(n||0).toLocaleString('fa-IR'); }
+function toNum(s) { return Number(String(s).replace(/,/g, '')) || 0; }
+function todayStr() { return new Date().toLocaleDateString('fa-IR'); }
+function showToast(msg, isErr) {
+  let t = document.createElement('div');
+  t.className = 'toast ' + (isErr ? 'toast-error' : 'toast-success');
+  t.innerHTML = '<i class="fas ' + (isErr ? 'fa-exclamation-circle' : 'fa-check-circle') + ' ml-1"></i>' + msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2800);
+}
+function confirmAction(msg, cb) { if (confirm(msg + '\nآیا مطمئن هستید؟')) cb(); }
+function closeModals() { document.querySelectorAll('.modal-overlay').forEach(el => el.remove()); }
+
+function calcScore(studentId) {
+  let r = appData.reports.filter(r => r.studentId === studentId);
+  let p = r.filter(r => r.type === 'positive').length;
+  let n = r.filter(r => r.type === 'negative').length;
+  let a = r.filter(r => r.type === 'absent' || r.type === 'excused').length;
+  let l = r.filter(r => r.type === 'late').length;
+  let s = 20 + (p * 2) - (n * 1.5) - (a * 0.5) - (l * 0.3);
+  return Math.max(0, Math.min(20, Math.round(s * 10) / 10));
+}
+function calcAvg(studentId) {
+  let g = appData.grades.filter(g => g.studentId === studentId);
+  if (!g.length) return 0;
+  return Math.round((g.reduce((a, b) => a + b.score, 0) / g.length) * 10) / 10;
+}
+
+function saveData() { localStorage.setItem('nazemyar_v18', JSON.stringify(appData)); }
+function loadData() {
+  let s = localStorage.getItem('nazemyar_v18');
+  if (s) { let p = JSON.parse(s); Object.assign(appData, p); }
+  renderAll();
+}
+
+// ============================================================
+// TUITION FUNCTIONS
+// ============================================================
+function getTuitionRecord(studentId) {
+  return appData.tuitions.find(t => t.studentId === studentId);
+}
+function ensureTuitionRecord(studentId) {
+  let r = getTuitionRecord(studentId);
+  if (!r) {
+    r = { studentId: studentId, totalTuition: 0, discount: 0, dueDate: '', payments: [] };
+    appData.tuitions.push(r);
+  }
+  return r;
+}
+function getTuitionPaid(studentId) {
+  let r = getTuitionRecord(studentId);
+  if (!r) return 0;
+  return r.payments.reduce((sum, p) => sum + toNum(p.amount), 0);
+}
+function getTuitionRemaining(studentId) {
+  let r = getTuitionRecord(studentId);
+  if (!r) return 0;
+  let total = toNum(r.totalTuition);
+  let discount = toNum(r.discount || 0);
+  let paid = getTuitionPaid(studentId);
+  return Math.max(0, total - discount - paid);
+}
+function getTuitionStatus(studentId) {
+  let r = getTuitionRecord(studentId);
+  if (!r || !r.totalTuition || toNum(r.totalTuition) === 0) return 'تعیین‌نشده';
+  let remaining = getTuitionRemaining(studentId);
+  let paid = getTuitionPaid(studentId);
+  if (remaining <= 0) return 'تسویه‌شده';
+  if (paid > 0) return 'پرداخت جزئی';
+  return 'معوقه';
+}
+function getStatusClass(status) {
+  const map = { 'تسویه‌شده': 'paid', 'پرداخت جزئی': 'partial', 'معوقه': 'debt', 'در انتظار پرداخت': 'pending', 'تعیین‌نشده': 'undefined' };
+  return map[status] || 'undefined';
+}
+function getStatusIcon(status) {
+  const map = { 'تسویه‌شده': '🟢', 'پرداخت جزئی': '🟡', 'معوقه': '🔴', 'در انتظار پرداخت': '🟠', 'تعیین‌نشده': '⚪' };
+  return map[status] || '⚪';
+}
+
+// ============================================================
+// ACCOUNTING FUNCTIONS
+// ============================================================
+function fillCategorySelects() {
+  let type = document.getElementById('txType').value;
+  let catSelect = document.getElementById('txCategory');
+  if (catSelect) {
+    let cats = appData.categories[type] || [];
+    let currentVal = catSelect.value;
+    catSelect.innerHTML = '<option value="">انتخاب دسته</option>';
+    cats.forEach(c => {
+      let opt = document.createElement('option');
+      opt.value = c;
+      opt.textContent = c;
+      catSelect.appendChild(opt);
+    });
+    if (currentVal && cats.includes(currentVal)) catSelect.value = currentVal;
+  }
+  let filterCat = document.getElementById('filterTxCategory');
+  if (filterCat) {
+    let allCats = [...appData.categories.income, ...appData.categories.expense];
+    let currentVal = filterCat.value;
+    filterCat.innerHTML = '<option value="">همه دسته‌ها</option>';
+    allCats.forEach(c => {
+      let opt = document.createElement('option');
+      opt.value = c;
+      opt.textContent = c;
+      filterCat.appendChild(opt);
+    });
+    if (currentVal && allCats.includes(currentVal)) filterCat.value = currentVal;
+  }
+}
+
+// ============================================================
+// MODAL
+// ============================================================
+function createModal(title, content, maxWidth) {
+  let div = document.createElement('div');
+  div.className = 'modal-overlay';
+  div.innerHTML = '<div class="modal-content" style="max-width:' + (maxWidth || '550px') + ';"><h3 style="font-weight:700;font-size:1.1rem;margin-bottom:0.8rem;border-bottom:2px solid var(--border);padding-bottom:0.5rem;">' + title + '</h3>' + content + '<button onclick="this.closest(\'.modal-overlay\').remove()" class="btn btn-outline" style="width:100%;margin-top:0.8rem;justify-content:center;">بستن</button></div>';
+  div.addEventListener('click', function(e) { if (e.target === this) this.remove(); });
+  return div;
+}
+
+// ============================================================
+// SIGNATURE PAD
+// ============================================================
+function initSignaturePad(canvas) {
+  let ctx = canvas.getContext('2d');
+  let drawing = false, last = null;
+  function pos(e) {
+    let rect = canvas.getBoundingClientRect();
+    let cx = (e.touches ? e.touches[0].clientX : e.clientX);
+    let cy = (e.touches ? e.touches[0].clientY : e.clientY);
+    return { x: (cx - rect.left) * (canvas.width / rect.width), y: (cy - rect.top) * (canvas.height / rect.height) };
+  }
+  function start(e) { drawing = true; last = pos(e); e.preventDefault(); }
+  function move(e) {
+    if (!drawing) return;
+    let p = pos(e);
+    ctx.strokeStyle = '#1e1b4b';
+    ctx.lineWidth = 2.5;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(last.x, last.y);
+    ctx.lineTo(p.x, p.y);
+    ctx.stroke();
+    last = p;
+    e.preventDefault();
+  }
+  function end() { drawing = false; }
+  canvas.addEventListener('mousedown', start);
+  canvas.addEventListener('mousemove', move);
+  window.addEventListener('mouseup', end);
+  canvas.addEventListener('touchstart', start, { passive: false });
+  canvas.addEventListener('touchmove', move, { passive: false });
+  canvas.addEventListener('touchend', end);
+}
+function clearSignatureCanvas(canvas) {
+  canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+}
+function isCanvasEmpty(canvas) {
+  let ctx = canvas.getContext('2d');
+  let data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+  for (let i = 3; i < data.length; i += 4) if (data[i] !== 0) return false;
+  return true;
+}
+
+// ============================================================
+// CONSENT FUNCTIONS - کاملاً بازطراحی‌شده
+// ============================================================
+function renderConsentTab() {
+  // آمار
+  let total = appData.consentForms.length;
+  let allResponses = appData.consentResponses;
+  let approved = allResponses.filter(r => r.status === 'approved').length;
+  let rejected = allResponses.filter(r => r.status === 'rejected').length;
+  let pending = allResponses.filter(r => r.status === 'pending').length;
+  
+  document.getElementById('consentTotal').textContent = total;
+  document.getElementById('consentApproved').textContent = approved;
+  document.getElementById('consentRejected').textContent = rejected;
+  document.getElementById('consentPending').textContent = pending;
+
+  // پر کردن لیست دانش‌آموزان برای انتخاب
+  fillConsentStudentSelect();
+
+  // نمایش لیست رضایت‌نامه‌ها
+  let el = document.getElementById('consentFormsList');
+  if (!el) return;
+  if (!appData.consentForms.length) {
+    el.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--text-secondary);">هیچ رضایت‌نامه‌ای ایجاد نشده است</div>';
+    return;
+  }
+
+  el.innerHTML = appData.consentForms.slice().reverse().map(f => {
+    let r = appData.consentResponses.filter(x => x.formId === f.id);
+    let ok = r.filter(x => x.status === 'approved').length;
+    let rej = r.filter(x => x.status === 'rejected').length;
+    let pend = r.filter(x => x.status === 'pending').length;
+    let pct = r.length ? Math.round(ok / r.length * 100) : 0;
+    let expired = f.deadline && new Date(f.deadline) < new Date();
+
+    return '<div class="card" style="margin-bottom:0.8rem;border-right:4px solid ' + (expired ? '#e5e7eb' : (pct === 100 ? 'var(--success)' : 'var(--warning)')) + ';">' +
+      '<div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:start;gap:0.5rem;">' +
+        '<div>' +
+          '<div style="font-weight:800;font-size:1rem;">' + f.title + '</div>' +
+          '<div style="font-size:0.7rem;color:var(--text-secondary);">' +
+            (f.targetType === 'all' ? '👥 همه دانش‌آموزان' : f.targetType === 'class' ? '🏫 کلاس ' + f.targetClass : '🎯 انتخاب شده') +
+            ' | مهلت: ' + (f.deadline || 'نامشخص') + (expired ? ' ⏰ منقضی' : '') +
+            ' | ایجاد: ' + (f.createdDate || '') +
+          '</div>' +
+        '</div>' +
+        '<div style="display:flex;gap:0.3rem;flex-wrap:wrap;">' +
+          '<button onclick="viewConsentDetail(\'' + f.id + '\')" class="btn btn-outline btn-sm"><i class="fas fa-eye"></i> جزئیات</button>' +
+          '<button onclick="exportConsentExcel(\'' + f.id + '\')" class="btn btn-success btn-sm"><i class="fas fa-file-excel"></i> خروجی</button>' +
+          '<button onclick="confirmAction(\'حذف رضایت‌نامه؟\',()=>deleteConsent(\'' + f.id + '\'))" class="btn btn-ghost btn-sm" style="color:var(--danger);"><i class="fas fa-trash"></i></button>' +
+        '</div>' +
+      '</div>' +
+      '<div style="display:flex;flex-wrap:wrap;gap:0.3rem;margin-top:0.3rem;">' +
+        '<span class="badge badge-success">✅ تایید: ' + ok + '</span>' +
+        '<span class="badge badge-danger">❌ رد: ' + rej + '</span>' +
+        '<span class="badge badge-gray">⏳ در انتظار: ' + pend + '</span>' +
+        '<span class="badge badge-info">مجموع: ' + r.length + '</span>' +
+        (expired ? '<span class="badge badge-gray">⏰ منقضی</span>' : '') +
+      '</div>' +
+      '<div class="progress-track" style="margin-top:0.3rem;"><div class="progress-fill" style="width:' + pct + '%;background:' + (pct === 100 ? 'var(--success)' : 'var(--primary)') + ';"></div></div>' +
+      '<div style="font-size:0.65rem;color:var(--text-secondary);margin-top:0.1rem;">' + pct + '% تایید شده</div>' +
+    '</div>';
+  }).join('');
+}
+
+function fillConsentStudentSelect() {
+  let sel = document.getElementById('consentSelectedStudents');
+  if (!sel) return;
+  let currentVal = sel.value;
+  sel.innerHTML = appData.students.map(s => '<option value="' + s.nationalCode + '">' + s.fullname + ' - ' + (s.className || 'بدون کلاس') + '</option>').join('');
+  if (currentVal) sel.value = currentVal;
+}
+
+// ===== ایجاد رضایت‌نامه =====
+document.getElementById('createConsentBtn')?.addEventListener('click', function() {
+  let title = document.getElementById('consentTitle').value.trim();
+  let text = document.getElementById('consentText').value.trim();
+  let deadline = document.getElementById('consentDeadline').value || '';
+  let targetType = document.getElementById('consentTargetType').value;
+  let targetClass = document.getElementById('consentTargetClass').value;
+  let selectedStudents = document.getElementById('consentSelectedStudents');
+
+  if (!title || !text) { showToast('❌ عنوان و متن الزامی است', true); return; }
+
+  let targets = [];
+  if (targetType === 'all') {
+    targets = appData.students;
+  } else if (targetType === 'class') {
+    if (!targetClass) { showToast('❌ لطفاً کلاس را انتخاب کنید', true); return; }
+    targets = appData.students.filter(s => s.className === targetClass);
+  } else if (targetType === 'selected') {
+    let selected = Array.from(selectedStudents.selectedOptions).map(opt => opt.value);
+    if (!selected.length) { showToast('❌ حداقل یک دانش‌آموز را انتخاب کنید', true); return; }
+    targets = appData.students.filter(s => selected.includes(s.nationalCode));
+  }
+
+  if (!targets.length) { showToast('❌ هیچ دانش‌آموزی برای این مخاطب یافت نشد', true); return; }
+
+  let form = {
+    id: uid('cf'),
+    title: title,
+    text: text,
+    targetType: targetType,
+    targetClass: targetClass,
+    deadline: deadline,
+    createdDate: todayStr()
+  };
+  appData.consentForms.push(form);
+
+  targets.forEach(s => {
+    appData.consentResponses.push({
+      id: uid('cr'),
+      formId: form.id,
+      studentId: s.nationalCode,
+      status: 'pending',
+      parentName: '',
+      signature: null,
+      respondedDate: null
+    });
+  });
+
+  saveData();
+  renderConsentTab();
+  // پاک کردن فرم
+  document.getElementById('consentTitle').value = '';
+  document.getElementById('consentText').value = '';
+  document.getElementById('consentDeadline').value = '';
+  showToast('✅ رضایت‌نامه برای ' + targets.length + ' دانش‌آموز ایجاد شد');
+});
+
+// ===== حذف رضایت‌نامه =====
+window.deleteConsent = function(id) {
+  appData.consentForms = appData.consentForms.filter(f => f.id !== id);
+  appData.consentResponses = appData.consentResponses.filter(r => r.formId !== id);
+  saveData();
+  renderConsentTab();
+  showToast('✅ رضایت‌نامه با موفقیت حذف شد');
+};
+
+// ===== مشاهده جزئیات رضایت‌نامه =====
+window.viewConsentDetail = function(formId) {
+  let f = appData.consentForms.find(x => x.id === formId);
+  if (!f) return;
+  let r = appData.consentResponses.filter(x => x.formId === formId);
+  
+  let statusMap = { approved: '✅ تایید شده', rejected: '❌ رد شده', pending: '⏳ در انتظار' };
+  let statusClass = { approved: 'consent-status approved', rejected: 'consent-status rejected', pending: 'consent-status pending' };
+
+  let rows = r.map(x => {
+    let s = appData.students.find(st => st.nationalCode === x.studentId);
+    let link = location.origin + location.pathname + '?consent=' + x.id;
+    return '<tr>' +
+      '<td style="text-align:right;">' + (s?.fullname || '-') + '</td>' +
+      '<td style="text-align:right;">' + (s?.className || '-') + '</td>' +
+      '<td style="text-align:right;"><span class="' + statusClass[x.status] + '">' + (statusMap[x.status] || x.status) + '</span></td>' +
+      '<td style="text-align:right;">' + (x.parentName || '-') + '</td>' +
+      '<td style="text-align:right;">' + (x.respondedDate || '-') + '</td>' +
+      '<td style="text-align:right;white-space:nowrap;">' +
+        '<input readonly value="' + link + '" style="font-size:0.6rem;padding:0.1rem 0.3rem;width:120px;background:var(--bg);border:1px solid var(--border);border-radius:4px;" onclick="this.select()"> ' +
+        '<button onclick="copyLink(\'' + link + '\')" class="btn btn-ghost btn-sm" style="color:var(--primary);"><i class="fas fa-copy"></i></button>' +
+        (x.signature ? '<button onclick="viewSignature(\'' + x.id + '\')" class="btn btn-ghost btn-sm" style="color:var(--secondary);" title="مشاهده امضا"><i class="fas fa-signature"></i></button>' : '') +
+        (x.status === 'pending' ? '<button onclick="manualConsentResponse(\'' + x.id + '\')" class="btn btn-warning btn-sm" style="padding:0.2rem 0.5rem;" title="ثبت پاسخ دستی"><i class="fas fa-pen"></i></button>' : '') +
+      '</td>' +
+    '</tr>';
+  }).join('');
+
+  let expired = f.deadline && new Date(f.deadline) < new Date();
+
+  let m = createModal('📋 رضایت‌نامه: ' + f.title, `
+    <div style="margin-bottom:0.5rem;padding:0.5rem;background:var(--bg);border-radius:8px;font-size:0.8rem;line-height:1.8;">
+      <div style="font-weight:700;">متن رضایت‌نامه:</div>
+      <p style="margin-top:0.2rem;">${f.text}</p>
+      <div style="font-size:0.7rem;color:var(--text-secondary);margin-top:0.3rem;">
+        مخاطب: ${f.targetType === 'all' ? '👥 همه دانش‌آموزان' : f.targetType === 'class' ? '🏫 کلاس ' + f.targetClass : '🎯 انتخاب شده'} |
+        مهلت: ${f.deadline || 'نامشخص'} ${expired ? '⏰ (منقضی)' : ''} |
+        ایجاد: ${f.createdDate || ''}
+      </div>
+    </div>
+    <div class="table-wrap" style="max-height:350px;overflow-y:auto;">
+      <table>
+        <thead><tr><th>دانش‌آموز</th><th>کلاس</th><th>وضعیت</th><th>والد</th><th>تاریخ پاسخ</th><th>لینک/عملیات</th></tr></thead>
+        <tbody>${rows || '<tr><td colspan="6" style="text-align:center;padding:0.5rem;color:var(--text-secondary);">پاسخی ثبت نشده</td></tr>'}</tbody>
+      </table>
+    </div>
+    <div style="display:flex;gap:0.5rem;margin-top:0.5rem;flex-wrap:wrap;">
+      <button onclick="exportConsentExcel('${f.id}')" class="btn btn-success btn-sm"><i class="fas fa-file-excel"></i> خروجی اکسل</button>
+      <button onclick="this.closest('.modal-overlay').remove()" class="btn btn-outline btn-sm">بستن</button>
+    </div>
+  `, '750px');
+  document.body.appendChild(m);
+};
+
+// ===== ثبت پاسخ دستی =====
+window.manualConsentResponse = function(responseId) {
+  let r = appData.consentResponses.find(x => x.id === responseId);
+  if (!r) return;
+  let s = appData.students.find(st => st.nationalCode === r.studentId);
+  let f = appData.consentForms.find(x => x.id === r.formId);
+
+  let m = createModal('ثبت پاسخ دستی - ' + (s?.fullname || ''), `
+    <div style="margin-bottom:0.5rem;padding:0.5rem;background:var(--bg);border-radius:8px;font-size:0.75rem;">
+      <strong>${f.title}</strong>
+      <p style="margin-top:0.2rem;">${f.text}</p>
+    </div>
+    <div style="display:flex;gap:0.5rem;margin-bottom:0.5rem;">
+      <label style="display:flex;align-items:center;gap:0.3rem;cursor:pointer;">
+        <input type="radio" name="manualDecision" value="approved" checked> <span class="badge badge-success">✅ تایید</span>
+      </label>
+      <label style="display:flex;align-items:center;gap:0.3rem;cursor:pointer;">
+        <input type="radio" name="manualDecision" value="rejected"> <span class="badge badge-danger">❌ رد</span>
+      </label>
+    </div>
+    <div style="margin-bottom:0.5rem;">
+      <label>نام والد</label>
+      <input type="text" id="manualParentName" style="width:100%;" placeholder="نام و نام خانوادگی والد">
+    </div>
+    <button onclick="saveManualResponse('${responseId}')" class="btn btn-primary" style="width:100%;justify-content:center;">💾 ثبت پاسخ</button>
+  `, '500px');
+  document.body.appendChild(m);
+};
+
+window.saveManualResponse = function(responseId) {
+  let r = appData.consentResponses.find(x => x.id === responseId);
+  if (!r) return;
+  let decision = document.querySelector('input[name="manualDecision"]:checked').value;
+  let parentName = document.getElementById('manualParentName').value.trim();
+  if (!parentName) { showToast('❌ نام والد الزامی است', true); return; }
+  r.status = decision;
+  r.parentName = parentName;
+  r.respondedDate = todayStr();
+  r.signature = null;
+  saveData();
+  closeModals();
+  renderConsentTab();
+  showToast('✅ پاسخ با موفقیت ثبت شد');
+};
+
+// ===== مشاهده امضا =====
+window.viewSignature = function(responseId) {
+  let r = appData.consentResponses.find(x => x.id === responseId);
+  if (!r || !r.signature) return;
+  let m = createModal('امضای دیجیتال', `
+    <div style="text-align:center;">
+      <img src="${r.signature}" style="max-width:100%;border:1px solid var(--border);border-radius:8px;background:#fff;">
+      <p style="margin-top:0.5rem;font-size:0.8rem;">امضاکننده: <strong>${r.parentName || '-'}</strong> | تاریخ: ${r.respondedDate || '-'}</p>
+    </div>
+  `, '500px');
+  document.body.appendChild(m);
+};
+
+// ===== کپی لینک =====
+window.copyLink = function(link) {
+  navigator.clipboard?.writeText(link).then(() => showToast('✅ لینک کپی شد')).catch(() => { prompt('لینک:', link); });
+};
+
+// ===== خروجی اکسل رضایت‌نامه =====
+window.exportConsentExcel = function(formId) {
+  let f = appData.consentForms.find(x => x.id === formId);
+  if (!f) return;
+  let r = appData.consentResponses.filter(x => x.formId === formId);
+  let wb = XLSX.utils.book_new();
+  let data = r.map(x => {
+    let s = appData.students.find(st => st.nationalCode === x.studentId);
+    return {
+      'نام دانش‌آموز': s?.fullname || '-',
+      'کد ملی': s?.nationalCode || '-',
+      'کلاس': s?.className || '-',
+      'وضعیت': x.status === 'approved' ? 'تایید شده' : x.status === 'rejected' ? 'رد شده' : 'در انتظار',
+      'نام والد': x.parentName || '-',
+      'تاریخ پاسخ': x.respondedDate || '-'
+    };
+  });
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data), 'رضایت‌نامه');
+  let summary = [
+    ['خلاصه رضایت‌نامه'],
+    ['عنوان', f.title],
+    ['مخاطب', f.targetType === 'all' ? 'همه دانش‌آموزان' : f.targetType === 'class' ? 'کلاس ' + f.targetClass : 'انتخاب شده'],
+    ['مهلت', f.deadline || 'نامشخص'],
+    ['تاریخ ایجاد', f.createdDate || ''],
+    ['تعداد کل', r.length],
+    ['تایید شده', r.filter(x => x.status === 'approved').length],
+    ['رد شده', r.filter(x => x.status === 'rejected').length],
+    ['در انتظار', r.filter(x => x.status === 'pending').length]
+  ];
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(summary), 'خلاصه');
+  XLSX.writeFile(wb, 'رضایت‌نامه_' + f.title + '_' + todayStr() + '.xlsx');
+  showToast('✅ خروجی اکسل رضایت‌نامه ذخیره شد');
+};
+
+// ============================================================
+// CONSENT TARGET TYPE CHANGE
+// ============================================================
+document.getElementById('consentTargetType')?.addEventListener('change', function() {
+  let val = this.value;
+  document.getElementById('consentClassWrap').style.display = val === 'class' ? 'block' : 'none';
+  document.getElementById('consentSelectedWrap').style.display = val === 'selected' ? 'block' : 'none';
+  if (val === 'selected') fillConsentStudentSelect();
+});
+
+// ============================================================
+// RENDER FUNCTIONS (بقیه توابع)
+// ============================================================
+function renderAll() {
+  renderDashboard();
+  renderClassesList();
+  renderCoursesOfClasses();
+  renderTeacherAssignmentsList();
+  renderStudentsTable();
+  renderTeachersTable();
+  renderSupervisorsTable();
+  renderReportsTable();
+  renderTeacherGradesTable();
+  renderTeacherHomeworksTable();
+  renderTeacherAttendanceTable();
+  fillSelects();
+  renderDashboardCharts();
+  renderHierarchy();
+  fillReportSelects();
+  updateFilterClassSelect();
+  updateSchoolStats();
+  updateSmartInsights();
+  updateAIInsights();
+  renderAccountingTab();
+  renderTuitionTab();
+  renderConsentTab();
+}
+
+// ===== DASHBOARD =====
+function renderDashboard() {
+  document.getElementById('statStudents').textContent = appData.students.length;
+  document.getElementById('statTeachers').textContent = appData.teachers.length;
+  document.getElementById('statSupervisors').textContent = appData.supervisors.length;
+  document.getElementById('statClasses').textContent = appData.classes.length;
+  let g = appData.grades;
+  let avg = g.length ? (g.reduce((s, g) => s + g.score, 0) / g.length).toFixed(1) : 0;
+  document.getElementById('statAvg').textContent = avg;
+  let inc = appData.transactions.filter(t => t.type === 'income').reduce((s, t) => s + toNum(t.amount), 0);
+  let exp = appData.transactions.filter(t => t.type === 'expense').reduce((s, t) => s + toNum(t.amount), 0);
+  document.getElementById('statBalance').textContent = toFa(inc - exp);
+}
+
+// ===== CLASSES =====
+function renderClassesList() {
+  let ul = document.getElementById('classesList');
+  if (!ul) return;
+  ul.innerHTML = appData.classes.map(c =>
+    '<li style="display:flex;justify-content:space-between;align-items:center;padding:0.4rem 0.6rem;background:var(--bg);border-radius:8px;margin-bottom:0.3rem;"><span><i class="fas fa-door-open" style="color:var(--warning);margin-left:0.3rem;"></i>' + c.name + '</span><div><button onclick="editClass(\'' + c.id + '\')" class="btn btn-ghost btn-sm" style="color:var(--primary);"><i class="fas fa-edit"></i></button><button onclick="confirmAction(\'حذف کلاس ' + c.name + '؟\',()=>deleteClass(\'' + c.id + '\'))" class="btn btn-ghost btn-sm" style="color:var(--danger);"><i class="fas fa-trash"></i></button></div></li>'
+  ).join('');
+}
+window.editClass = function(id) {
+  let c = appData.classes.find(x => x.id === id);
+  let m = createModal('ویرایش کلاس', '<div><label>نام کلاس</label><input type="text" id="editClassName" value="' + c.name + '" style="width:100%;"></div><button onclick="saveEditClass(\'' + id + '\')" class="btn btn-primary" style="width:100%;margin-top:0.5rem;justify-content:center;">ذخیره</button>');
+  document.body.appendChild(m);
+};
+window.saveEditClass = function(id) {
+  let c = appData.classes.find(x => x.id === id);
+  let name = document.getElementById('editClassName').value.trim();
+  if (name && !appData.classes.some(x => x.name === name && x.id !== id)) {
+    c.name = name; saveData(); renderAll(); closeModals(); showToast('✅ کلاس با موفقیت ویرایش شد');
+  } else if (name) showToast('❌ نام کلاس تکراری است!', true);
+};
+window.deleteClass = function(id) {
+  appData.classes = appData.classes.filter(c => c.id !== id);
+  saveData(); renderAll(); showToast('✅ کلاس با موفقیت حذف شد');
+};
+
+function renderCoursesOfClasses() {
+  let el = document.getElementById('coursesOfClassesList');
+  if (!el) return;
+  let html = '';
+  for (let c of appData.classes) {
+    html += '<li style="padding:0.4rem 0.6rem;background:var(--bg);border-radius:8px;margin-bottom:0.3rem;"><div style="font-weight:700;color:var(--primary);">📚 ' + c.name + '</div><div style="margin-right:1rem;margin-top:0.2rem;">';
+    if (!c.courses?.length) html += '<div style="font-size:0.75rem;color:var(--text-secondary);">هنوز درسی تعریف نشده</div>';
+    for (let crs of (c.courses || [])) {
+      let t = appData.teachers.find(x => x.id === crs.teacherId);
+      html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:0.2rem 0;"><span>📖 ' + crs.courseName + (t ? ' (معلم: ' + t.name + ')' : ' (بدون معلم)') + '</span><div><button onclick="editCourse(\'' + c.id + '\',\'' + crs.courseName + '\')" class="btn btn-ghost btn-sm" style="color:var(--primary);"><i class="fas fa-edit"></i></button><button onclick="confirmAction(\'حذف درس ' + crs.courseName + '؟\',()=>deleteCourse(\'' + c.id + '\',\'' + crs.courseName + '\'))" class="btn btn-ghost btn-sm" style="color:var(--danger);"><i class="fas fa-trash"></i></button></div></div>';
+    }
+    html += '</div></li>';
+  }
+  el.innerHTML = html;
+}
+window.editCourse = function(classId, oldName) {
+  let c = appData.classes.find(x => x.id === classId);
+  let m = createModal('ویرایش درس', '<div><label>نام درس</label><input type="text" id="editCourseName" value="' + oldName + '" style="width:100%;"></div><button onclick="saveEditCourse(\'' + classId + '\',\'' + oldName + '\')" class="btn btn-primary" style="width:100%;margin-top:0.5rem;justify-content:center;">ذخیره</button>');
+  document.body.appendChild(m);
+};
+window.saveEditCourse = function(classId, oldName) {
+  let c = appData.classes.find(x => x.id === classId);
+  let crs = c.courses.find(x => x.courseName === oldName);
+  let name = document.getElementById('editCourseName').value.trim();
+  if (name && name !== oldName && !c.courses.some(x => x.courseName === name)) {
+    crs.courseName = name; saveData(); renderAll(); closeModals(); showToast('✅ درس با موفقیت ویرایش شد');
+  } else if (name && name !== oldName) showToast('❌ نام درس تکراری است!', true);
+};
+window.deleteCourse = function(classId, courseName) {
+  let c = appData.classes.find(x => x.id === classId);
+  if (c) { c.courses = c.courses.filter(x => x.courseName !== courseName); saveData(); renderAll(); showToast('✅ درس با موفقیت حذف شد'); }
+};
+
+function renderTeacherAssignmentsList() {
+  let el = document.getElementById('teacherAssignmentsList');
+  if (!el) return;
+  let html = '<div style="font-size:0.75rem;font-weight:700;color:var(--text-secondary);margin-bottom:0.3rem;">📌 تخصیص‌های فعلی:</div>';
+  let has = false;
+  for (let c of appData.classes) {
+    for (let crs of (c.courses || [])) {
+      let t = appData.teachers.find(x => x.id === crs.teacherId);
+      if (t) {
+        has = true;
+        html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:0.3rem 0.6rem;background:#d1fae5;border-radius:8px;margin-bottom:0.2rem;"><div><i class="fas fa-check-circle" style="color:var(--success);"></i> ' + c.name + ' | 📖 ' + crs.courseName + ' | 👨‍🏫 ' + t.name + '</div><div><button onclick="editAssignment(\'' + c.id + '\',\'' + crs.courseName + '\')" class="btn btn-ghost btn-sm" style="color:var(--primary);"><i class="fas fa-edit"></i></button><button onclick="confirmAction(\'حذف تخصیص؟\',()=>deleteAssignment(\'' + c.id + '\',\'' + crs.courseName + '\'))" class="btn btn-ghost btn-sm" style="color:var(--danger);"><i class="fas fa-trash"></i></button></div></div>';
+      }
+    }
+  }
+  if (!has) html += '<div style="text-align:center;padding:0.5rem;color:var(--text-secondary);">هیچ تخصیصی ثبت نشده</div>';
+  el.innerHTML = html;
+}
+window.deleteAssignment = function(classId, courseName) {
+  let c = appData.classes.find(x => x.id === classId);
+  let crs = c.courses.find(x => x.courseName === courseName);
+  if (crs) { crs.teacherId = null; saveData(); renderAll(); showToast('✅ تخصیص با موفقیت حذف شد'); }
+};
+window.editAssignment = function(classId, courseName) {
+  let c = appData.classes.find(x => x.id === classId);
+  let crs = c.courses.find(x => x.courseName === courseName);
+  let opts = appData.teachers.map(t => '<option value="' + t.id + '" ' + (t.id === crs.teacherId ? 'selected' : '') + '>' + t.name + '</option>').join('');
+  let m = createModal('ویرایش تخصیص', '<div><label>انتخاب معلم</label><select id="editAssignTeacher" style="width:100%;">' + opts + '</select></div><button onclick="saveEditAssignment(\'' + classId + '\',\'' + courseName + '\')" class="btn btn-primary" style="width:100%;margin-top:0.5rem;justify-content:center;">ذخیره</button>');
+  document.body.appendChild(m);
+};
+window.saveEditAssignment = function(classId, courseName) {
+  let c = appData.classes.find(x => x.id === classId);
+  let crs = c.courses.find(x => x.courseName === courseName);
+  let tid = document.getElementById('editAssignTeacher').value;
+  if (tid) { crs.teacherId = tid; saveData(); renderAll(); closeModals(); showToast('✅ تخصیص با موفقیت ویرایش شد'); }
+};
+
+// ===== STUDENTS =====
+function renderStudentsTable() {
+  let search = document.getElementById('searchStudent')?.value.toLowerCase() || '';
+  let filter = document.getElementById('filterClass')?.value || '';
+  let sort = document.getElementById('sortStudentsBy')?.value || 'name';
+  let filtered = appData.students.filter(s => (s.fullname.toLowerCase().includes(search) || s.nationalCode.includes(search) || (s.className || '').toLowerCase().includes(search)) && (filter === '' || s.className === filter));
+  if (sort === 'name') filtered.sort((a, b) => a.fullname.localeCompare(b.fullname));
+  else if (sort === 'class') filtered.sort((a, b) => (a.className || '').localeCompare(b.className || ''));
+  else if (sort === 'code') filtered.sort((a, b) => a.nationalCode.localeCompare(b.nationalCode));
+  let tbody = document.getElementById('studentsListTable');
+  if (!tbody) return;
+  tbody.innerHTML = filtered.map(s => {
+    let avg = calcAvg(s.nationalCode);
+    let score = calcScore(s.nationalCode);
+    let avgCls = avg >= 17 ? 'grade-excellent' : avg >= 14 ? 'grade-good' : avg >= 10 ? 'grade-average' : 'grade-poor';
+    let scrCls = score >= 17 ? 'grade-excellent' : score >= 14 ? 'grade-good' : score >= 10 ? 'grade-average' : 'grade-poor';
+    let stat = getTuitionStatus(s.nationalCode);
+    let badge = stat === 'تسویه‌شده' ? 'badge-success' : stat === 'معوقه' ? 'badge-danger' : stat === 'پرداخت جزئی' ? 'badge-warning' : 'badge-gray';
+    return '<tr><td style="font-weight:600;">' + s.fullname + '</td><td>' + s.nationalCode + '</td><td>' + (s.className || '-') + '</td><td><span class="' + avgCls + '">' + avg + '</span></td><td><span class="' + scrCls + '">' + score + '</span></td><td><span class="badge ' + badge + '">' + stat + '</span></td><td><button onclick="showStudentCard(\'' + s.nationalCode + '\')" class="btn btn-ghost btn-sm" style="color:var(--primary);"><i class="fas fa-eye"></i></button><button onclick="editStudent(\'' + s.nationalCode + '\')" class="btn btn-ghost btn-sm" style="color:var(--primary);"><i class="fas fa-edit"></i></button><button onclick="confirmAction(\'حذف دانش‌آموز ' + s.fullname + '؟\',()=>deleteStudent(\'' + s.nationalCode + '\'))" class="btn btn-ghost btn-sm" style="color:var(--danger);"><i class="fas fa-trash"></i></button></td></tr>';
+  }).join('');
+  if (!filtered.length) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:1rem;color:var(--text-secondary);">دانش‌آموزی یافت نشد</td></tr>';
+}
+window.showStudentCard = function(id) {
+  let s = appData.students.find(x => x.nationalCode === id);
+  if (!s) return;
+  let g = appData.grades.filter(x => x.studentId === id);
+  let r = appData.reports.filter(x => x.studentId === id);
+  let present = r.filter(x => x.type === 'present').length;
+  let absent = r.filter(x => x.type === 'absent').length;
+  let excused = r.filter(x => x.type === 'excused').length;
+  let late = r.filter(x => x.type === 'late').length;
+  let positive = r.filter(x => x.type === 'positive').length;
+  let negative = r.filter(x => x.type === 'negative').length;
+  let score = calcScore(id);
+  let avg = calcAvg(id);
+  let t = getTuitionRecord(id);
+  let tuHtml = t && t.totalTuition ? '<div style="margin-top:0.5rem;padding:0.5rem;background:#fef3c7;border-radius:8px;"><span style="font-weight:700;">شهریه:</span> کل: ' + toFa(t.totalTuition) + ' | تخفیف: ' + toFa(t.discount||0) + ' | پرداخت: <span style="color:var(--success);">' + toFa(getTuitionPaid(id)) + '</span> | مانده: <span style="color:var(--danger);">' + toFa(getTuitionRemaining(id)) + '</span></div>' : '';
+  let m = createModal('📘 کارنامه - ' + s.fullname, '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-bottom:0.5rem;"><div style="padding:0.5rem;background:var(--bg);border-radius:8px;"><p><i class="fas fa-id-card"></i> کد: ' + s.nationalCode + '</p><p><i class="fas fa-door-open"></i> کلاس: ' + (s.className || '-') + '</p></div><div style="padding:0.5rem;background:var(--bg);border-radius:8px;"><p><i class="fas fa-phone"></i> تلفن: ' + (s.phone || '-') + '</p><p><i class="fas fa-users"></i> والدین: ' + (s.parentPhone || '-') + '</p></div></div><div style="display:grid;grid-template-columns:repeat(6,1fr);gap:0.2rem;text-align:center;margin-bottom:0.5rem;"><div style="padding:0.2rem;background:#d1fae5;border-radius:6px;"><div style="font-weight:700;color:var(--success);">' + present + '</div><div style="font-size:0.55rem;">حضور</div></div><div style="padding:0.2rem;background:#fee2e2;border-radius:6px;"><div style="font-weight:700;color:var(--danger);">' + absent + '</div><div style="font-size:0.55rem;">غیبت</div></div><div style="padding:0.2rem;background:var(--primary-bg);border-radius:6px;"><div style="font-weight:700;color:var(--primary);">' + excused + '</div><div style="font-size:0.55rem;">موجه</div></div><div style="padding:0.2rem;background:#fef3c7;border-radius:6px;"><div style="font-weight:700;color:var(--warning);">' + late + '</div><div style="font-size:0.55rem;">تأخیر</div></div><div style="padding:0.2rem;background:var(--primary-bg);border-radius:6px;"><div style="font-weight:700;color:var(--primary);">' + positive + '</div><div style="font-size:0.55rem;">مثبت</div></div><div style="padding:0.2rem;background:#ede9fe;border-radius:6px;"><div style="font-weight:700;color:var(--secondary);">' + negative + '</div><div style="font-size:0.55rem;">تخلف</div></div></div><div style="text-align:center;padding:0.3rem;background:var(--bg);border-radius:8px;margin-bottom:0.5rem;"><span style="font-weight:700;">معدل:</span> <span style="font-size:1.2rem;font-weight:800;color:' + (avg >= 17 ? 'var(--success)' : avg >= 14 ? 'var(--primary)' : avg >= 10 ? 'var(--warning)' : 'var(--danger)') + ';">' + avg + '</span> | <span style="font-weight:700;">انضباط:</span> <span style="font-size:1.2rem;font-weight:800;color:' + (score >= 15 ? 'var(--success)' : 'var(--danger)') + ';">' + score + '</span></div>' + tuHtml + '<div style="margin-top:0.5rem;"><span style="font-weight:700;font-size:0.8rem;">📊 نمرات (' + g.length + ')</span><ul style="list-style:none;font-size:0.75rem;max-height:80px;overflow-y:auto;border:1px solid var(--border);border-radius:6px;padding:0.3rem;">' + (g.length ? g.map(x => '<li style="border-bottom:1px solid var(--border);padding:0.1rem 0;">📖 ' + x.courseName + ' (' + (x.type === 'exam' ? 'امتحان' : 'تکلیف') + '): <span style="font-weight:700;">' + x.score + '</span></li>').join('') : '<li style="color:var(--text-secondary);">موردی ثبت نشده</li>') + '</ul></div>', '650px');
+  document.body.appendChild(m);
+};
+window.editStudent = function(id) {
+  let s = appData.students.find(x => x.nationalCode === id);
+  let opts = appData.classes.map(c => '<option value="' + c.name + '" ' + (c.name === s.className ? 'selected' : '') + '>' + c.name + '</option>').join('');
+  let m = createModal('ویرایش دانش‌آموز', '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0.3rem;"><div><label>نام</label><input type="text" id="editSName" value="' + s.fullname + '" style="width:100%;"></div><div><label>کد ملی</label><input type="text" id="editSCode" value="' + s.nationalCode + '" style="width:100%;"></div><div><label>تولد</label><input type="text" id="editSBirth" value="' + (s.birthYear || '') + '" style="width:100%;"></div><div><label>آدرس</label><input type="text" id="editSAddr" value="' + (s.address || '') + '" style="width:100%;"></div><div><label>تلفن</label><input type="text" id="editSPhone" value="' + (s.phone || '') + '" style="width:100%;"></div><div><label>والدین</label><input type="text" id="editSParent" value="' + (s.parentPhone || '') + '" style="width:100%;"></div><div style="grid-column:span 2;"><label>کلاس</label><select id="editSClass" style="width:100%;">' + opts + '</select></div></div><button onclick="saveEditStudent(\'' + id + '\')" class="btn btn-primary" style="width:100%;margin-top:0.5rem;justify-content:center;">ذخیره</button>');
+  document.body.appendChild(m);
+};
+window.saveEditStudent = function(id) {
+  let s = appData.students.find(x => x.nationalCode === id);
+  s.fullname = document.getElementById('editSName').value.trim();
+  s.nationalCode = document.getElementById('editSCode').value.trim();
+  s.birthYear = document.getElementById('editSBirth').value;
+  s.address = document.getElementById('editSAddr').value;
+  s.phone = document.getElementById('editSPhone').value;
+  s.parentPhone = document.getElementById('editSParent').value;
+  s.className = document.getElementById('editSClass').value;
+  saveData(); renderAll(); closeModals(); showToast('✅ اطلاعات دانش‌آموز با موفقیت ویرایش شد');
+};
+window.deleteStudent = function(id) {
+  appData.students = appData.students.filter(x => x.nationalCode !== id);
+  saveData(); renderAll(); showToast('✅ دانش‌آموز با موفقیت حذف شد');
+};
+
+// ===== TEACHERS =====
+function renderTeachersTable() {
+  let search = document.getElementById('searchTeacher')?.value.toLowerCase() || '';
+  let filtered = appData.teachers.filter(t => t.name.toLowerCase().includes(search) || t.code.includes(search));
+  let tbody = document.getElementById('teachersListTable');
+  if (!tbody) return;
+  if (!filtered.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:1rem;color:var(--text-secondary);">هیچ معلمی یافت نشد</td></tr>'; return; }
+  tbody.innerHTML = filtered.map(t => {
+    let assigned = [];
+    for (let c of appData.classes) for (let crs of (c.courses || [])) if (crs.teacherId === t.id) assigned.push(crs.courseName + ' (' + c.name + ')');
+    let g = appData.grades.filter(x => x.teacherId === t.id);
+    let avg = g.length ? (g.reduce((s, x) => s + x.score, 0) / g.length).toFixed(1) : 0;
+    let cls = avg >= 17 ? 'grade-excellent' : avg >= 14 ? 'grade-good' : avg >= 10 ? 'grade-average' : 'grade-poor';
+    return '<tr><td style="font-weight:600;">' + t.name + '</td><td>' + t.code + '</td><td>' + (t.phone || '-') + '</td><td style="font-size:0.7rem;">' + (assigned.join(', ') || '-') + '</td><td><span class="' + cls + '">' + avg + '</span></td><td><button onclick="editTeacher(\'' + t.id + '\')" class="btn btn-ghost btn-sm" style="color:var(--primary);"><i class="fas fa-edit"></i></button><button onclick="confirmAction(\'حذف معلم ' + t.name + '؟\',()=>deleteTeacher(\'' + t.id + '\'))" class="btn btn-ghost btn-sm" style="color:var(--danger);"><i class="fas fa-trash"></i></button></td></tr>';
+  }).join('');
+}
+window.editTeacher = function(id) {
+  let t = appData.teachers.find(x => x.id === id);
+  let m = createModal('ویرایش معلم', '<div style="space-y:0.3rem;"><div><label>نام</label><input type="text" id="editTName" value="' + t.name + '" style="width:100%;"></div><div><label>کد</label><input type="text" id="editTCode" value="' + t.code + '" style="width:100%;"></div><div><label>تلفن</label><input type="text" id="editTPhone" value="' + (t.phone || '') + '" style="width:100%;"></div><div><label>رمز جدید</label><input type="password" id="editTPwd" placeholder="اختیاری" style="width:100%;"></div></div><button onclick="saveEditTeacher(\'' + id + '\')" class="btn btn-primary" style="width:100%;margin-top:0.5rem;justify-content:center;">ذخیره</button>');
+  document.body.appendChild(m);
+};
+window.saveEditTeacher = function(id) {
+  let t = appData.teachers.find(x => x.id === id);
+  let name = document.getElementById('editTName').value.trim();
+  let code = document.getElementById('editTCode').value.trim();
+  if (!name || !code) { showToast('❌ نام و کد الزامی است', true); return; }
+  if (code !== t.code && appData.teachers.some(x => x.code === code)) { showToast('❌ کد تکراری!', true); return; }
+  t.name = name; t.code = code; t.phone = document.getElementById('editTPhone').value.trim();
+  let pwd = document.getElementById('editTPwd').value;
+  if (pwd) t.password = pwd;
+  saveData(); renderAll(); closeModals(); showToast('✅ اطلاعات معلم با موفقیت ویرایش شد');
+};
+window.deleteTeacher = function(id) {
+  for (let c of appData.classes) for (let crs of (c.courses || [])) if (crs.teacherId === id) crs.teacherId = null;
+  appData.teachers = appData.teachers.filter(x => x.id !== id);
+  saveData(); renderAll(); showToast('✅ معلم با موفقیت حذف شد');
+};
+
+// ===== SUPERVISORS =====
+function renderSupervisorsTable() {
+  let search = document.getElementById('searchSupervisor')?.value.toLowerCase() || '';
+  let filtered = appData.supervisors.filter(s => s.name.toLowerCase().includes(search) || s.code.includes(search));
+  let tbody = document.getElementById('supervisorsListTable');
+  if (!tbody) return;
+  tbody.innerHTML = filtered.map(s => '<tr><td style="font-weight:600;">' + s.name + '</td><td>' + s.code + '</td><td>' + (s.phone || '-') + '</td><td><button onclick="editSupervisor(\'' + s.id + '\')" class="btn btn-ghost btn-sm" style="color:var(--primary);"><i class="fas fa-edit"></i></button><button onclick="confirmAction(\'حذف ناظم ' + s.name + '؟\',()=>deleteSupervisor(\'' + s.id + '\'))" class="btn btn-ghost btn-sm" style="color:var(--danger);"><i class="fas fa-trash"></i></button></td></tr>').join('');
+  if (!filtered.length) tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:1rem;color:var(--text-secondary);">هیچ ناظمی یافت نشد</td></tr>';
+}
+window.editSupervisor = function(id) {
+  let s = appData.supervisors.find(x => x.id === id);
+  let m = createModal('ویرایش ناظم', '<div style="space-y:0.3rem;"><div><label>نام</label><input type="text" id="editSName" value="' + s.name + '" style="width:100%;"></div><div><label>کد</label><input type="text" id="editSCode" value="' + s.code + '" style="width:100%;"></div><div><label>تلفن</label><input type="text" id="editSPhone" value="' + (s.phone || '') + '" style="width:100%;"></div><div><label>رمز جدید</label><input type="password" id="editSPwd" placeholder="اختیاری" style="width:100%;"></div></div><button onclick="saveEditSupervisor(\'' + id + '\')" class="btn btn-primary" style="width:100%;margin-top:0.5rem;justify-content:center;">ذخیره</button>');
+  document.body.appendChild(m);
+};
+window.saveEditSupervisor = function(id) {
+  let s = appData.supervisors.find(x => x.id === id);
+  let name = document.getElementById('editSName').value.trim();
+  let code = document.getElementById('editSCode').value.trim();
+  if (!name || !code) { showToast('❌ نام و کد الزامی است', true); return; }
+  if (code !== s.code && appData.supervisors.some(x => x.code === code)) { showToast('❌ کد تکراری!', true); return; }
+  s.name = name; s.code = code; s.phone = document.getElementById('editSPhone').value.trim();
+  let pwd = document.getElementById('editSPwd').value;
+  if (pwd) s.password = pwd;
+  saveData(); renderAll(); closeModals(); showToast('✅ اطلاعات ناظم با موفقیت ویرایش شد');
+};
+window.deleteSupervisor = function(id) {
+  appData.supervisors = appData.supervisors.filter(x => x.id !== id);
+  saveData(); renderAll(); showToast('✅ ناظم با موفقیت حذف شد');
+};
+
+// ============================================================
+// REPORTS
+// ============================================================
+function renderTeacherGradesTable() {
+  let search = document.getElementById('searchTeacherGrades')?.value.toLowerCase() || '';
+  let filterClass = document.getElementById('filterTeacherClass')?.value || '';
+  let filterTeacher = document.getElementById('filterTeacherName')?.value || '';
+  let filtered = appData.grades.filter(g => {
+    let s = appData.students.find(x => x.nationalCode === g.studentId);
+    let t = appData.teachers.find(x => x.id === g.teacherId);
+    let ms = !search || (t?.name?.toLowerCase().includes(search)) || (s?.fullname?.toLowerCase().includes(search)) || (g.courseName?.toLowerCase().includes(search));
+    let mc = !filterClass || (s && s.className === filterClass);
+    let mt = !filterTeacher || (t && t.id === filterTeacher);
+    return ms && mc && mt;
+  });
+  filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+  let tbody = document.getElementById('teacherGradesTable');
+  if (!tbody) return;
+  tbody.innerHTML = filtered.map(g => {
+    let s = appData.students.find(x => x.nationalCode === g.studentId);
+    let t = appData.teachers.find(x => x.id === g.teacherId);
+    let typeText = { exam: 'امتحان', homework: 'تکلیف', activity: 'فعالیت', project: 'پروژه' }[g.type] || g.type;
+    let cls = g.score >= 17 ? 'grade-excellent' : g.score >= 14 ? 'grade-good' : g.score >= 10 ? 'grade-average' : 'grade-poor';
+    return '<tr><td>' + (t?.name || '-') + '</td><td>' + (s?.fullname || '-') + '</td><td>' + (s?.className || '-') + '</td><td style="font-weight:600;">' + g.courseName + '</td><td>' + typeText + '</td><td>' + (g.title || '-') + '</td><td><span class="' + cls + '">' + g.score + '</span></td><td style="color:var(--text-secondary);">' + g.date + '</td></tr>';
+  }).join('');
+  document.getElementById('teacherGradesCount').textContent = filtered.length;
+  if (!filtered.length) tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:1rem;color:var(--text-secondary);">هیچ نمره‌ای ثبت نشده</td></tr>';
+}
+
+function renderTeacherHomeworksTable() {
+  let search = document.getElementById('searchHomework')?.value.toLowerCase() || '';
+  let filtered = appData.homeworks.filter(h => {
+    let t = appData.teachers.find(x => x.id === h.teacherId);
+    return !search || h.title.toLowerCase().includes(search) || h.className.toLowerCase().includes(search) || (t?.name?.toLowerCase().includes(search));
+  });
+  filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+  let tbody = document.getElementById('teacherHomeworksTable');
+  if (!tbody) return;
+  tbody.innerHTML = filtered.map(h => {
+    let t = appData.teachers.find(x => x.id === h.teacherId);
+    return '<tr><td>' + (t?.name || '-') + '</td><td>' + h.className + '</td><td>' + h.courseName + '</td><td style="font-weight:600;">' + h.title + '</td><td style="max-width:120px;">' + (h.description || '-') + '</td><td>' + h.deadline + '</td><td style="color:var(--text-secondary);">' + h.date + '</td></tr>';
+  }).join('');
+  if (!filtered.length) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:1rem;color:var(--text-secondary);">هیچ تکلیفی ثبت نشده</td></tr>';
+}
+
+function renderTeacherAttendanceTable() {
+  let search = document.getElementById('searchTeacherAttendance')?.value.toLowerCase() || '';
+  let filterType = document.getElementById('filterAttendanceType')?.value || '';
+  let filtered = appData.reports.filter(r => {
+    let s = appData.students.find(x => x.nationalCode === r.studentId);
+    let ms = !search || (s?.fullname?.toLowerCase().includes(search)) || (s?.className?.toLowerCase().includes(search));
+    let mt = !filterType || r.type === filterType;
+    return ms && mt && ['present', 'absent', 'late', 'excused'].includes(r.type);
+  });
+  filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+  let tbody = document.getElementById('teacherAttendanceTable');
+  if (!tbody) return;
+  let typeMap = { present: '✅ حاضر', absent: '❌ غایب', late: '⏰ تأخیر', excused: '📋 غیبت موجه' };
+  let colorMap = { present: 'color:var(--success);', absent: 'color:var(--danger);', late: 'color:var(--warning);', excused: 'color:var(--primary);' };
+  tbody.innerHTML = filtered.map(r => {
+    let s = appData.students.find(x => x.nationalCode === r.studentId);
+    return '<tr><td>' + (r.reporter || 'معلم/ناظم') + '</td><td>' + (s?.fullname || '-') + '</td><td>' + (s?.className || '-') + '</td><td style="font-weight:600;' + (colorMap[r.type] || '') + '">' + (typeMap[r.type] || r.type) + '</td><td>' + r.date + '</td><td style="max-width:120px;">' + (r.description || '-') + '</td></tr>';
+  }).join('');
+  if (!filtered.length) tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:1rem;color:var(--text-secondary);">هیچ گزارشی ثبت نشده</td></tr>';
+}
+
+function renderReportsTable() {
+  let search = document.getElementById('searchReport')?.value.toLowerCase() || '';
+  let filtered = appData.reports.filter(r => {
+    let s = appData.students.find(x => x.nationalCode === r.studentId);
+    return s?.fullname.toLowerCase().includes(search) || s?.className?.toLowerCase().includes(search);
+  });
+  filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+  let tbody = document.getElementById('allReportsTable');
+  if (!tbody) return;
+  let typeMap = { present: '✅ حضور', absent: '❌ غیبت', excused: '📋 غیبت موجه', late: '⏰ تأخیر', positive: '🌟 رفتار مثبت', negative: '⚠️ تخلف' };
+  let colorMap = { present: 'color:var(--success);', absent: 'color:var(--danger);', excused: 'color:var(--primary);', late: 'color:var(--warning);', positive: 'color:var(--primary);', negative: 'color:var(--danger);' };
+  tbody.innerHTML = filtered.map(r => {
+    let s = appData.students.find(x => x.nationalCode === r.studentId);
+    return '<tr><td>' + (s?.fullname || r.studentId) + '</td><td>' + (s?.className || '-') + '</td><td style="font-weight:600;' + (colorMap[r.type] || '') + '">' + (typeMap[r.type] || r.type) + '</td><td>' + r.date + '</td><td>' + (r.description || '-') + '</td><td>' + (r.reporter || 'ناظم') + '</td></tr>';
+  }).join('');
+  if (!filtered.length) tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:1rem;color:var(--text-secondary);">هیچ گزارشی یافت نشد</td></tr>';
+}
+
+// ============================================================
+// AI INSIGHTS
+// ============================================================
+function updateAIInsights() {
+  let allG = appData.grades;
+  let avg = allG.length ? (allG.reduce((s, g) => s + g.score, 0) / allG.length).toFixed(1) : 0;
+  let totalS = appData.students.length;
+  let totalT = appData.teachers.length;
+  let neg = appData.reports.filter(r => r.type === 'negative').length;
+  let absent = appData.reports.filter(r => r.type === 'absent' || r.type === 'excused').length;
+  let summary = '📌 وضعیت: ' + totalS + ' دانش‌آموز، ' + totalT + ' معلم. میانگین نمرات ' + avg + ' از 20. ';
+  if (avg >= 17) summary += 'وضعیت عالی! 🎉';
+  else if (avg >= 14) summary += 'وضعیت خوب ✅';
+  else if (avg >= 10) summary += 'وضعیت متوسط ⚠️';
+  else summary += 'وضعیت ضعیف ❗';
+  if (neg > 10) summary += ' تخلفات (' + neg + ') نسبتاً بالا.';
+  document.getElementById('aiSummary').textContent = summary;
+  let sugg = [];
+  if (avg < 14) sugg.push('کلاس‌های جبرانی');
+  if (neg > totalS * 0.5) sugg.push('جلسات انضباطی');
+  if (absent > totalS * 2) sugg.push('پیگیری غیبت‌ها');
+  if (!sugg.length) sugg.push('وضعیت خوب است!');
+  document.getElementById('aiSuggestions').innerHTML = sugg.map(s => '• ' + s).join('<br>');
+  let trends = {};
+  appData.grades.forEach(g => { if (!trends[g.courseName]) trends[g.courseName] = []; trends[g.courseName].push(g.score); });
+  let th = '';
+  for (let c in trends) {
+    let s = trends[c];
+    if (s.length >= 3) { let r = s.slice(-3); let up = r[2] > r[0]; th += '• ' + c + ': ' + (up ? '📈 صعودی' : '📉 نزولی') + ' (' + r[0] + ' → ' + r[2] + ')<br>'; }
+  }
+  document.getElementById('aiTrends').innerHTML = th || 'داده کافی نیست.';
+  let alerts = [];
+  let absentMap = {};
+  appData.reports.filter(r => r.type === 'absent').forEach(r => { absentMap[r.studentId] = (absentMap[r.studentId] || 0) + 1; });
+  let high = Object.values(absentMap).filter(v => v >= 5).length;
+  if (high) alerts.push('⚠️ ' + high + ' دانش‌آموز غیبت بیش از ۵ جلسه');
+  if (avg < 12) alerts.push('⚠️ میانگین نمرات پایین');
+  if (neg > 20) alerts.push('⚠️ افزایش تخلفات');
+  let debtors = appData.students.filter(s => getTuitionStatus(s.nationalCode) === 'معوقه').length;
+  if (debtors) alerts.push('⚠️ ' + debtors + ' دانش‌آموز شهریه معوقه');
+  if (!alerts.length) alerts.push('✅ هیچ هشدار جدی وجود ندارد');
+  document.getElementById('aiAlerts').innerHTML = alerts.map(a => '• ' + a).join('<br>');
+}
+
+function updateSmartInsights() {
+  let tAvgs = {};
+  appData.teachers.forEach(t => { tAvgs[t.id] = { name: t.name, total: 0, count: 0 }; });
+  appData.grades.forEach(g => { if (tAvgs[g.teacherId]) { tAvgs[g.teacherId].total += g.score; tAvgs[g.teacherId].count++; } });
+  let best = null, bestAvg = -1;
+  for (let id in tAvgs) { let avg = tAvgs[id].count ? tAvgs[id].total / tAvgs[id].count : 0; if (avg > bestAvg) { bestAvg = avg; best = tAvgs[id].name; } }
+  document.getElementById('bestTeacherOfMonth').textContent = best ? best + ' (' + bestAvg.toFixed(1) + ')' : '---';
+  let risk = appData.students.filter(s => calcScore(s.nationalCode) < 12).length;
+  document.getElementById('studentsAtRisk').textContent = risk;
+  let absentMap = {};
+  appData.reports.filter(r => r.type === 'absent').forEach(r => { absentMap[r.studentId] = (absentMap[r.studentId] || 0) + 1; });
+  let maxA = 0, maxName = '---';
+  for (let id in absentMap) { if (absentMap[id] > maxA && absentMap[id] >= 3) { maxA = absentMap[id]; let s = appData.students.find(x => x.nationalCode === id); maxName = s ? s.fullname + ' (' + maxA + ')' : '---'; } }
+  document.getElementById('mostAbsentStudent').textContent = maxA >= 3 ? maxName : 'غیبت چشمگیر ندارد';
+  let courseSum = {}, courseCount = {};
+  appData.grades.forEach(g => { if (!courseSum[g.courseName]) { courseSum[g.courseName] = 0; courseCount[g.courseName] = 0; } courseSum[g.courseName] += g.score; courseCount[g.courseName]++; });
+  let topC = null, topA = -1;
+  for (let c in courseSum) { let avg = courseSum[c] / courseCount[c]; if (avg > topA) { topA = avg; topC = c; } }
+  document.getElementById('topSubjectAvg').textContent = topC ? topC + ' (' + topA.toFixed(1) + ')' : '---';
+}
+
+function updateSchoolStats() {
+  let allG = appData.grades;
+  let avg = allG.length ? (allG.reduce((s, g) => s + g.score, 0) / allG.length).toFixed(1) : 0;
+  document.getElementById('schoolAvgGrade').textContent = avg;
+  let allR = appData.reports;
+  let present = allR.filter(r => r.type === 'present').length;
+  let total = allR.filter(r => ['present', 'absent', 'excused', 'late'].includes(r.type)).length;
+  document.getElementById('schoolAttendanceRate').textContent = total ? Math.round(present / total * 100) + '%' : '0%';
+  document.getElementById('totalGradesCount').textContent = allG.length;
+  document.getElementById('totalViolations').textContent = allR.filter(r => r.type === 'negative').length;
+}
+
+// ============================================================
+// ACCOUNTING
+// ============================================================
+function renderAccountingTab() {
+  fillCategorySelects();
+  let inc = appData.transactions.filter(t => t.type === 'income').reduce((s, t) => s + toNum(t.amount), 0);
+  let exp = appData.transactions.filter(t => t.type === 'expense').reduce((s, t) => s + toNum(t.amount), 0);
+  document.getElementById('accIncome').textContent = toFa(inc);
+  document.getElementById('accExpense').textContent = toFa(exp);
+  let bal = document.getElementById('accBalance');
+  bal.textContent = toFa(inc - exp);
+  bal.style.color = (inc - exp) >= 0 ? 'var(--success)' : 'var(--danger)';
+  document.getElementById('accCount').textContent = toFa(appData.transactions.length);
+  renderTxTable();
+  renderAccountingCharts();
+}
+
+function renderTxTable() {
+  let search = document.getElementById('searchTx')?.value.toLowerCase() || '';
+  let filterType = document.getElementById('filterTxType')?.value || '';
+  let filterCat = document.getElementById('filterTxCategory')?.value || '';
+  let filtered = appData.transactions.filter(t => {
+    let ms = !search || (t.description || '').toLowerCase().includes(search) || t.category.toLowerCase().includes(search);
+    let mt = !filterType || t.type === filterType;
+    let mc = !filterCat || t.category === filterCat;
+    return ms && mt && mc;
+  });
+  filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+  let tbody = document.getElementById('txTable');
+  if (!tbody) return;
+  tbody.innerHTML = filtered.map((t, idx) => {
+    let realIdx = appData.transactions.indexOf(t);
+    return '<tr>' +
+      '<td><span class="badge ' + (t.type === 'income' ? 'badge-success' : 'badge-danger') + '">' + (t.type === 'income' ? 'درآمد' : 'هزینه') + '</span></td>' +
+      '<td>' + t.category + '</td>' +
+      '<td style="text-align:right;direction:ltr;color:' + (t.type === 'income' ? 'var(--success)' : 'var(--danger)') + ';font-weight:700;">' + (t.type === 'income' ? '+' : '-') + toFa(t.amount) + '</td>' +
+      '<td>' + (t.description || '-') + '</td>' +
+      '<td>' + t.date + '</td>' +
+      '<td style="white-space:nowrap;">' +
+        '<button onclick="editTransaction(' + realIdx + ')" class="btn btn-ghost btn-sm" style="color:var(--primary);" title="ویرایش"><i class="fas fa-edit"></i></button> ' +
+        '<button onclick="confirmAction(\'حذف این تراکنش؟\',()=>deleteTx(' + realIdx + '))" class="btn btn-ghost btn-sm" style="color:var(--danger);" title="حذف"><i class="fas fa-trash"></i></button>' +
+      '</td>' +
+    '</tr>';
+  }).join('');
+  document.getElementById('txShownCount').textContent = filtered.length;
+  if (!filtered.length) tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:1rem;color:var(--text-secondary);">تراکنشی یافت نشد</td></tr>';
+}
+
+window.editTransaction = function(index) {
+  let t = appData.transactions[index];
+  if (!t) return;
+  let cats = appData.categories[t.type] || [];
+  let catOptions = cats.map(c => '<option value="' + c + '" ' + (c === t.category ? 'selected' : '') + '>' + c + '</option>').join('');
+  let m = createModal('ویرایش تراکنش', `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-bottom:0.5rem;">
+      <div><label>نوع</label><select id="editTxType" style="width:100%;"><option value="income" ${t.type === 'income' ? 'selected' : ''}>درآمد</option><option value="expense" ${t.type === 'expense' ? 'selected' : ''}>هزینه</option></select></div>
+      <div><label>دسته‌بندی</label><select id="editTxCategory" style="width:100%;">${catOptions}</select></div>
+      <div><label>مبلغ (تومان)</label><input type="number" id="editTxAmount" value="${t.amount}" style="width:100%;"></div>
+      <div><label>تاریخ</label><input type="text" id="editTxDate" value="${t.date || todayStr()}" style="width:100%;" placeholder="مثال: ۱۴۰۴/۰۵/۱۵"></div>
+      <div style="grid-column:span 2;"><label>توضیحات</label><input type="text" id="editTxDesc" value="${t.description || ''}" style="width:100%;" placeholder="توضیحات"></div>
+    </div>
+    <button onclick="saveEditTransaction(${index})" class="btn btn-primary" style="width:100%;margin-top:0.5rem;justify-content:center;">💾 ذخیره تغییرات</button>
+  `, '580px');
+  document.body.appendChild(m);
+  document.getElementById('editTxType').addEventListener('change', function() {
+    let newType = this.value;
+    let newCats = appData.categories[newType] || [];
+    let catSelect = document.getElementById('editTxCategory');
+    catSelect.innerHTML = '<option value="">انتخاب دسته</option>' + newCats.map(c => '<option value="' + c + '">' + c + '</option>').join('');
+  });
+};
+
+window.saveEditTransaction = function(index) {
+  let t = appData.transactions[index];
+  if (!t) return;
+  let type = document.getElementById('editTxType').value;
+  let category = document.getElementById('editTxCategory').value;
+  let amount = Number(document.getElementById('editTxAmount').value);
+  let date = document.getElementById('editTxDate').value || todayStr();
+  let description = document.getElementById('editTxDesc').value;
+  if (!category || !amount || amount <= 0) { showToast('❌ لطفاً دسته و مبلغ معتبر وارد کنید', true); return; }
+  t.type = type; t.category = category; t.amount = amount; t.date = date; t.description = description;
+  saveData(); closeModals(); renderAccountingTab(); showToast('✅ تراکنش با موفقیت ویرایش شد');
+};
+
+window.deleteTx = function(idx) {
+  appData.transactions.splice(idx, 1);
+  saveData(); renderAccountingTab(); showToast('✅ تراکنش با موفقیت حذف شد');
+};
+
+function renderAccountingCharts() {
+  let ctxM = document.getElementById('accMonthlyChart')?.getContext('2d');
+  if (ctxM) { if (window._accM) window._accM.destroy(); let { labels, income, expense } = monthlyFinance(6); window._accM = new Chart(ctxM, { type: 'bar', data: { labels: labels, datasets: [{ label: 'درآمد', data: income, backgroundColor: '#10b981', borderRadius: 5 }, { label: 'هزینه', data: expense, backgroundColor: '#ef4444', borderRadius: 5 }] }, options: { plugins: { legend: { position: 'bottom' } } } }); }
+  let ctxC = document.getElementById('accCategoryChart')?.getContext('2d');
+  if (ctxC) { if (window._accC) window._accC.destroy(); let byCat = {}; appData.transactions.filter(t => t.type === 'expense').forEach(t => { byCat[t.category] = (byCat[t.category] || 0) + toNum(t.amount); }); let labels = Object.keys(byCat); let palette = ['#ef4444', '#f59e0b', '#7c3aed', '#0584fc', '#10b981', '#e07a5f']; window._accC = new Chart(ctxC, { type: 'pie', data: { labels: labels, datasets: [{ data: labels.map(l => byCat[l]), backgroundColor: palette }] } }); }
+}
+
+function monthlyFinance(months) {
+  let buckets = {};
+  let now = new Date();
+  let labels = [];
+  for (let i = months - 1; i >= 0; i--) {
+    let d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    let key = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+    buckets[key] = { income: 0, expense: 0 };
+    labels.push(d.toLocaleDateString('fa-IR', { month: 'long' }));
+  }
+  appData.transactions.forEach(t => {
+    if (!t.date) return;
+    let parts = t.date.split('/');
+    if (parts.length === 3) {
+      let key = parts[0] + '-' + String(Number(parts[1])).padStart(2, '0');
+      if (buckets[key]) buckets[key][t.type] += toNum(t.amount);
+    }
+  });
+  let keys = Object.keys(buckets);
+  return { labels, income: keys.map(k => buckets[k].income), expense: keys.map(k => buckets[k].expense) };
+}
+
+// ============================================================
+// TUITION
+// ============================================================
+function renderTuitionTab() {
+  let classFilter = document.getElementById('filterTuiClass');
+  if (classFilter) {
+    let currentVal = classFilter.value;
+    classFilter.innerHTML = '<option value="">همه کلاس‌ها</option>';
+    let uniqueClasses = [...new Set(appData.students.map(s => s.className).filter(Boolean))];
+    uniqueClasses.forEach(c => {
+      let opt = document.createElement('option');
+      opt.value = c;
+      opt.textContent = c;
+      classFilter.appendChild(opt);
+    });
+    if (currentVal) classFilter.value = currentVal;
+  }
+  let totalTuition = 0, totalPaid = 0, totalRemaining = 0, debtors = 0;
+  appData.students.forEach(s => {
+    let r = getTuitionRecord(s.nationalCode);
+    if (r && r.totalTuition && toNum(r.totalTuition) > 0) {
+      let paid = getTuitionPaid(s.nationalCode);
+      let rem = getTuitionRemaining(s.nationalCode);
+      totalTuition += toNum(r.totalTuition) - toNum(r.discount || 0);
+      totalPaid += paid;
+      totalRemaining += rem;
+      if (getTuitionStatus(s.nationalCode) === 'معوقه') debtors++;
+    }
+  });
+  document.getElementById('tuiTotal').textContent = toFa(totalTuition);
+  document.getElementById('tuiPaid').textContent = toFa(totalPaid);
+  document.getElementById('tuiRemaining').textContent = toFa(totalRemaining);
+  document.getElementById('tuiDebtors').textContent = debtors;
+  renderTuitionTable();
+}
+
+function renderTuitionTable() {
+  let search = document.getElementById('searchTui')?.value.toLowerCase() || '';
+  let filterClass = document.getElementById('filterTuiClass')?.value || '';
+  let filterStatus = document.getElementById('filterTuiStatus')?.value || '';
+  let filtered = appData.students.filter(s => {
+    let ms = s.fullname.toLowerCase().includes(search) || s.nationalCode.includes(search);
+    let mc = !filterClass || s.className === filterClass;
+    let mst = !filterStatus || getTuitionStatus(s.nationalCode) === filterStatus;
+    return ms && mc && mst;
+  });
+  let tbody = document.getElementById('tuitionTable');
+  if (!tbody) return;
+  if (!filtered.length) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:1.5rem;color:var(--text-secondary);">هیچ دانش‌آموزی یافت نشد</td></tr>';
+    document.getElementById('tuiCount').textContent = '0';
+    return;
+  }
+  tbody.innerHTML = filtered.map(s => {
+    let r = getTuitionRecord(s.nationalCode);
+    let total = r ? r.totalTuition : 0;
+    let discount = r ? (r.discount || 0) : 0;
+    let paid = getTuitionPaid(s.nationalCode);
+    let rem = getTuitionRemaining(s.nationalCode);
+    let stat = getTuitionStatus(s.nationalCode);
+    let statusClass = getStatusClass(stat);
+    let statusIcon = getStatusIcon(stat);
+    return '<tr>' +
+      '<td style="font-weight:600;text-align:right;white-space:nowrap;">' + s.fullname + '</td>' +
+      '<td style="text-align:right;white-space:nowrap;">' + (s.className || '-') + '</td>' +
+      '<td style="text-align:right;white-space:nowrap;font-weight:700;">' + toFa(total) + '</td>' +
+      '<td style="text-align:right;white-space:nowrap;color:var(--text-secondary);">' + toFa(discount) + '</td>' +
+      '<td style="text-align:right;white-space:nowrap;color:var(--success);font-weight:700;">' + toFa(paid) + '</td>' +
+      '<td style="text-align:right;white-space:nowrap;color:' + (rem > 0 ? 'var(--danger)' : 'var(--success)') + ';font-weight:700;">' + toFa(rem) + '</td>' +
+      '<td style="text-align:right;white-space:nowrap;"><span class="tuition-status ' + statusClass + '">' + statusIcon + ' ' + stat + '</span></td>' +
+      '<td style="text-align:right;white-space:nowrap;">' +
+        '<button onclick="openTuitionModal(\'' + s.nationalCode + '\')" class="btn btn-primary btn-sm" style="padding:0.2rem 0.6rem;margin-left:0.2rem;" title="تعیین/ویرایش شهریه"><i class="fas fa-coins"></i></button> ' +
+        '<button onclick="addTuitionPayment(\'' + s.nationalCode + '\')" class="btn btn-success btn-sm" style="padding:0.2rem 0.6rem;margin-left:0.2rem;" title="ثبت پرداخت"><i class="fas fa-plus-circle"></i></button> ' +
+        '<button onclick="viewTuitionHistory(\'' + s.nationalCode + '\')" class="btn btn-outline btn-sm" style="padding:0.2rem 0.6rem;" title="تاریخچه پرداخت"><i class="fas fa-clock-rotate-left"></i></button>' +
+      '</td>' +
+    '</tr>';
+  }).join('');
+  document.getElementById('tuiCount').textContent = filtered.length;
+}
+
+window.openTuitionModal = function(studentId) {
+  let r = ensureTuitionRecord(studentId);
+  let s = appData.students.find(x => x.nationalCode === studentId);
+  let m = createModal('تعیین شهریه - ' + s.fullname, `
+    <div style="space-y:0.5rem;">
+      <div><label>کل شهریه (تومان)</label><input type="number" id="tuiTotalInput" value="${r.totalTuition || 0}" style="width:100%;"></div>
+      <div><label>تخفیف (تومان)</label><input type="number" id="tuiDiscountInput" value="${r.discount || 0}" style="width:100%;"></div>
+      <div><label>سررسید (مثال: ۱۴۰۴/۰۵/۱۵)</label><input type="text" id="tuiDueInput" value="${r.dueDate || ''}" style="width:100%;" placeholder="مثال: ۱۴۰۴/۰۵/۱۵"></div>
+      <div style="background:var(--bg);padding:0.5rem;border-radius:8px;margin-top:0.3rem;">
+        <span style="font-size:0.75rem;color:var(--text-secondary);">پرداخت شده: <strong style="color:var(--success);">${toFa(getTuitionPaid(studentId))}</strong></span>
+        <span style="font-size:0.75rem;color:var(--text-secondary);margin-right:0.5rem;">مانده: <strong style="color:${getTuitionRemaining(studentId) > 0 ? 'var(--danger)' : 'var(--success)'};">${toFa(getTuitionRemaining(studentId))}</strong></span>
+      </div>
+    </div>
+    <button onclick="saveTuitionModal('${studentId}')" class="btn btn-primary" style="width:100%;margin-top:0.5rem;justify-content:center;">💾 ذخیره شهریه</button>
+  `, '500px');
+  document.body.appendChild(m);
+};
+
+window.saveTuitionModal = function(studentId) {
+  let r = ensureTuitionRecord(studentId);
+  r.totalTuition = Number(document.getElementById('tuiTotalInput').value) || 0;
+  r.discount = Number(document.getElementById('tuiDiscountInput').value) || 0;
+  r.dueDate = document.getElementById('tuiDueInput').value;
+  saveData(); closeModals(); renderTuitionTab(); showToast('✅ شهریه با موفقیت ثبت شد');
+};
+
+window.addTuitionPayment = function(studentId) {
+  let s = appData.students.find(x => x.nationalCode === studentId);
+  let r = ensureTuitionRecord(studentId);
+  let m = createModal('ثبت پرداخت شهریه - ' + s.fullname, `
+    <div style="space-y:0.5rem;">
+      <div><label>مبلغ (تومان)</label><input type="number" id="payAmountInput" style="width:100%;"></div>
+      <div><label>تاریخ پرداخت</label><input type="text" id="payDateInput" value="${todayStr()}" style="width:100%;" placeholder="مثال: ۱۴۰۴/۰۵/۱۵"></div>
+      <div><label>روش پرداخت</label><select id="payMethodInput" style="width:100%;"><option value="نقدی">نقدی</option><option value="کارت به کارت">کارت به کارت</option><option value="انتقال بانکی">انتقال بانکی</option><option value="چک">چک</option></select></div>
+      <div><label>توضیحات</label><input type="text" id="payNoteInput" style="width:100%;" placeholder="اختیاری"></div>
+      <label style="display:flex;align-items:center;gap:0.3rem;margin-top:0.3rem;"><input type="checkbox" id="payAutoAccount" checked> ثبت خودکار در حسابداری</label>
+      <div style="background:var(--bg);padding:0.5rem;border-radius:8px;margin-top:0.3rem;">
+        <span style="font-size:0.75rem;color:var(--text-secondary);">کل شهریه: <strong>${toFa(r.totalTuition || 0)}</strong></span>
+        <span style="font-size:0.75rem;color:var(--text-secondary);margin-right:0.5rem;">پرداخت شده: <strong style="color:var(--success);">${toFa(getTuitionPaid(studentId))}</strong></span>
+        <span style="font-size:0.75rem;color:var(--text-secondary);margin-right:0.5rem;">مانده: <strong style="color:${getTuitionRemaining(studentId) > 0 ? 'var(--danger)' : 'var(--success)'};">${toFa(getTuitionRemaining(studentId))}</strong></span>
+      </div>
+    </div>
+    <button onclick="saveTuitionPayment('${studentId}')" class="btn btn-success" style="width:100%;margin-top:0.5rem;justify-content:center;">💳 ثبت پرداخت</button>
+  `, '500px');
+  document.body.appendChild(m);
+};
+
+window.saveTuitionPayment = function(studentId) {
+  let r = ensureTuitionRecord(studentId);
+  let amount = Number(document.getElementById('payAmountInput').value);
+  if (!amount || amount <= 0) { showToast('❌ مبلغ معتبر وارد کنید', true); return; }
+  let date = document.getElementById('payDateInput').value || todayStr();
+  let method = document.getElementById('payMethodInput').value;
+  let note = document.getElementById('payNoteInput').value;
+  let auto = document.getElementById('payAutoAccount').checked;
+  r.payments.push({ id: uid('pay'), amount: amount, date: date, method: method, note: note });
+  if (auto) {
+    let s = appData.students.find(x => x.nationalCode === studentId);
+    appData.transactions.push({ id: uid('tx'), type: 'income', category: 'شهریه', amount: amount, date: date, description: 'دریافت شهریه - ' + s.fullname + ' (' + method + ')' });
+  }
+  saveData(); closeModals(); renderTuitionTab(); showToast('✅ پرداخت با موفقیت ثبت شد');
+};
+
+window.viewTuitionHistory = function(studentId) {
+  let r = getTuitionRecord(studentId);
+  let s = appData.students.find(x => x.nationalCode === studentId);
+  let payments = r ? r.payments.slice().reverse() : [];
+  let m = createModal('تاریخچه پرداخت - ' + s.fullname, `
+    <div style="padding:0.5rem;background:var(--primary-bg);border-radius:8px;margin-bottom:0.5rem;">
+      <span style="font-weight:700;">خلاصه:</span>
+      کل: ${toFa(r ? r.totalTuition : 0)} |
+      تخفیف: ${toFa(r ? r.discount : 0)} |
+      پرداخت: <span style="color:var(--success);font-weight:700;">${toFa(getTuitionPaid(studentId))}</span> |
+      مانده: <span style="color:${getTuitionRemaining(studentId) > 0 ? 'var(--danger)' : 'var(--success)'};font-weight:700;">${toFa(getTuitionRemaining(studentId))}</span>
+    </div>
+    <div style="max-height:250px;overflow-y:auto;">
+      ${payments.length ? payments.map(p => `
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:0.3rem;border:1px solid var(--border);border-radius:6px;margin-bottom:0.2rem;">
+          <div><span style="color:var(--success);font-weight:700;">${toFa(p.amount)}</span> تومان - ${p.method}<br><span style="font-size:0.65rem;color:var(--text-secondary);">${p.date}${p.note ? ' - ' + p.note : ''}</span></div>
+          <button onclick="confirmAction('حذف پرداخت؟',()=>deleteTuitionPayment('${studentId}','${p.id}'))" class="btn btn-ghost btn-sm" style="color:var(--danger);"><i class="fas fa-trash"></i></button>
+        </div>
+      `).join('') : '<div style="text-align:center;padding:0.5rem;color:var(--text-secondary);">پرداختی ثبت نشده</div>'}
+    </div>
+  `, '550px');
+  document.body.appendChild(m);
+};
+
+window.deleteTuitionPayment = function(studentId, paymentId) {
+  let r = getTuitionRecord(studentId);
+  if (r) {
+    r.payments = r.payments.filter(p => p.id !== paymentId);
+    saveData(); closeModals(); renderTuitionTab(); showToast('✅ پرداخت با موفقیت حذف شد');
+  }
+};
+
+// ============================================================
+// HIERARCHY
+// ============================================================
+function renderHierarchy(search) {
+  let el = document.getElementById('hierarchyTree');
+  if (!el) return;
+  let s = (search || '').toLowerCase();
+  let html = '';
+  for (let c of appData.classes) {
+    if (s && !c.name.toLowerCase().includes(s)) continue;
+    let students = appData.students.filter(st => st.className === c.name);
+    html += '<div style="border:1px solid var(--border);border-radius:10px;padding:0.8rem;background:var(--bg);margin-bottom:0.8rem;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.3rem;"><h4 style="font-weight:700;color:var(--primary);"><i class="fas fa-door-open"></i> ' + c.name + '</h4><span style="font-size:0.7rem;padding:0.1rem 0.6rem;background:var(--primary-bg);border-radius:999px;color:var(--primary);">' + students.length + ' دانش‌آموز</span></div><div style="margin-right:1rem;"><div style="font-weight:600;font-size:0.8rem;">دانش‌آموزان:</div><ul style="list-style:none;margin-right:0.5rem;font-size:0.75rem;">';
+    if (!students.length) html += '<li style="color:var(--text-secondary);">هیچ دانش‌آموزی ثبت نشده</li>';
+    for (let st of students) {
+      let avg = calcAvg(st.nationalCode);
+      let score = calcScore(st.nationalCode);
+      html += '<li>• ' + st.fullname + ' <span style="color:' + (avg >= 17 ? 'var(--success)' : avg >= 14 ? 'var(--primary)' : avg >= 10 ? 'var(--warning)' : 'var(--danger)') + ';">(معدل: ' + avg + ')</span> <span style="color:' + (score >= 15 ? 'var(--success)' : 'var(--danger)') + ';">(انضباط: ' + score + ')</span></li>';
+    }
+    html += '</ul><div style="font-weight:600;font-size:0.8rem;margin-top:0.3rem;">معلمان و دروس:</div><ul style="list-style:none;margin-right:0.5rem;font-size:0.75rem;">';
+    if (!c.courses?.length) html += '<li style="color:var(--text-secondary);">هنوز درسی تعریف نشده</li>';
+    for (let crs of (c.courses || [])) {
+      let t = appData.teachers.find(x => x.id === crs.teacherId);
+      html += '<li>📖 ' + crs.courseName + ' → ' + (t ? t.name : 'معلم تعیین نشده') + '</li>';
+    }
+    html += '</ul></div></div>';
+  }
+  el.innerHTML = html || '<div style="text-align:center;padding:1rem;color:var(--text-secondary);">نتیجه‌ای یافت نشد</div>';
+}
+
+// ============================================================
+// EXCEL EXPORT
+// ============================================================
+function exportFullSchoolExcel() {
+  let wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([['اطلاعات کلی مدرسه'], ['تعداد کلاس‌ها', appData.classes.length], ['تعداد دانش‌آموزان', appData.students.length], ['تعداد معلمان', appData.teachers.length], ['تعداد ناظمین', appData.supervisors.length], ['میانگین نمرات', appData.grades.length ? (appData.grades.reduce((a, b) => a + b.score, 0) / appData.grades.length).toFixed(1) : 0]]), 'اطلاعات کلی');
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(appData.students.map(s => ({ 'نام': s.fullname, 'کد ملی': s.nationalCode, 'کلاس': s.className, 'معدل': calcAvg(s.nationalCode), 'نمره انضباط': calcScore(s.nationalCode), 'وضعیت شهریه': getTuitionStatus(s.nationalCode), 'تلفن': s.phone, 'والدین': s.parentPhone }))), 'دانش‌آموزان');
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(appData.teachers.map(t => ({ 'نام': t.name, 'کد': t.code, 'تلفن': t.phone }))), 'معلمان');
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(appData.supervisors.map(s => ({ 'نام': s.name, 'کد': s.code, 'تلفن': s.phone }))), 'ناظمین');
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(appData.reports.map(r => { let s = appData.students.find(x => x.nationalCode === r.studentId); return { 'دانش‌آموز': s?.fullname, 'کلاس': s?.className, 'نوع': r.type, 'تاریخ': r.date, 'توضیحات': r.description, 'ثبت‌کننده': r.reporter }; })), 'گزارشات');
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(appData.grades.map(g => { let s = appData.students.find(x => x.nationalCode === g.studentId); let t = appData.teachers.find(x => x.id === g.teacherId); return { 'معلم': t?.name, 'دانش‌آموز': s?.fullname, 'کلاس': s?.className, 'درس': g.courseName, 'نمره': g.score, 'تاریخ': g.date }; })), 'نمرات');
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(appData.transactions.map(t => ({ 'نوع': t.type === 'income' ? 'درآمد' : 'هزینه', 'دسته‌بندی': t.category, 'مبلغ': t.amount, 'توضیحات': t.description, 'تاریخ': t.date }))), 'حسابداری');
+  XLSX.writeFile(wb, 'گزارش_جامع_مدرسه_' + todayStr() + '.xlsx');
+  showToast('✅ خروجی اکسل با ۷ شیت ذخیره شد');
+}
+
+// ============================================================
+// CHARTS
+// ============================================================
+let charts = {};
+function renderDashboardCharts() {
+  let ctx1 = document.getElementById('studentsPerClassChart')?.getContext('2d');
+  if (ctx1) { if (charts.c1) charts.c1.destroy(); charts.c1 = new Chart(ctx1, { type: 'bar', data: { labels: appData.classes.map(c => c.name), datasets: [{ label: 'تعداد دانش‌آموز', data: appData.classes.map(c => appData.students.filter(s => s.className === c.name).length), backgroundColor: '#0584fc', borderRadius: 6 }] }, options: { plugins: { legend: { display: false } } } }); }
+  let ctx2 = document.getElementById('teachersVsSupervisorsChart')?.getContext('2d');
+  if (ctx2) { if (charts.c2) charts.c2.destroy(); charts.c2 = new Chart(ctx2, { type: 'doughnut', data: { labels: ['معلمان', 'ناظمین'], datasets: [{ data: [appData.teachers.length, appData.supervisors.length], backgroundColor: ['#10b981', '#7c3aed'] }] }, options: { plugins: { legend: { position: 'bottom' } } } }); }
+  let ctx3 = document.getElementById('schoolStatsChart')?.getContext('2d');
+  if (ctx3) {
+    if (charts.c3) charts.c3.destroy();
+    let subj = {};
+    appData.grades.forEach(g => { if (!subj[g.courseName]) subj[g.courseName] = { sum: 0, count: 0 }; subj[g.courseName].sum += g.score; subj[g.courseName].count++; });
+    let labels = Object.keys(subj);
+    let data = labels.map(l => (subj[l].sum / subj[l].count).toFixed(1));
+    charts.c3 = new Chart(ctx3, { type: 'bar', data: { labels, datasets: [{ label: 'میانگین نمرات', data, backgroundColor: '#0584fc', borderRadius: 6 }] }, options: { plugins: { legend: { display: false } } } });
+  }
+}
+
+// ============================================================
+// SELECTS
+// ============================================================
+function fillSelects() {
+  let ids = ['stdClassSelect', 'selectClassForCourse', 'selectClassForTeacher', 'filterTeacherClass'];
+  ids.forEach(id => {
+    let el = document.getElementById(id);
+    if (el) { let cur = el.value; el.innerHTML = '<option value="">انتخاب کلاس</option>' + appData.classes.map(c => '<option value="' + c.id + '">' + c.name + '</option>').join(''); if (cur) el.value = cur; }
+  });
+  let teacherSel = document.getElementById('selectTeacherForAssign');
+  if (teacherSel) teacherSel.innerHTML = '<option value="">انتخاب معلم</option>' + appData.teachers.map(t => '<option value="' + t.id + '">' + t.name + '</option>').join('');
+  let filterTeacher = document.getElementById('filterTeacherName');
+  if (filterTeacher) filterTeacher.innerHTML = '<option value="">همه معلمان</option>' + appData.teachers.map(t => '<option value="' + t.id + '">' + t.name + '</option>').join('');
+  let consentTarget = document.getElementById('consentTargetClass');
+  if (consentTarget) { let cur = consentTarget.value; consentTarget.innerHTML = '<option value="">انتخاب کلاس</option>' + appData.classes.map(c => '<option value="' + c.name + '">' + c.name + '</option>').join(''); if (cur) consentTarget.value = cur; }
+}
+
+function fillReportSelects() {
+  let search = document.getElementById('searchStudentCard')?.value.toLowerCase() || '';
+  let filtered = appData.students.filter(s => s.fullname.toLowerCase().includes(search) || s.nationalCode.includes(search));
+  let sel = document.getElementById('cardStudentSelect');
+  if (sel) { let cur = sel.value; sel.innerHTML = '<option value="">انتخاب دانش‌آموز</option>' + filtered.map(s => '<option value="' + s.nationalCode + '">' + s.fullname + ' - ' + s.className + '</option>').join(''); if (cur) sel.value = cur; }
+}
+
+function updateFilterClassSelect() {
+  let el = document.getElementById('filterClass');
+  if (el) { let cur = el.value; el.innerHTML = '<option value="">همه کلاس‌ها</option>' + appData.classes.map(c => '<option value="' + c.name + '">' + c.name + '</option>').join(''); if (cur) el.value = cur; }
+}
+
+// ============================================================
+// EVENT LISTENERS
+// ============================================================
+document.querySelectorAll('.sidebar-link').forEach(btn => {
+  btn.addEventListener('click', function() {
+    let tab = this.dataset.tab;
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+    let target = document.getElementById(tab + 'Tab');
+    if (target) target.classList.remove('hidden');
+    document.querySelectorAll('.sidebar-link').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    let titles = {
+      dashboard: ['داشبورد', 'خلاصه وضعیت کلی مدرسه'],
+      classes: ['مدیریت کلاس‌ها', 'تعریف کلاس، درس و تخصیص معلم'],
+      students: ['دانش‌آموزان', 'ثبت و مدیریت دانش‌آموزان'],
+      teachers: ['معلمان', 'ثبت و مدیریت معلمان'],
+      supervisors: ['ناظمین', 'ثبت و مدیریت ناظمین'],
+      hierarchy: ['سلسله مراتب', 'نمای درختی کامل مدرسه'],
+      accounting: ['حسابداری', 'مدیریت درآمد و هزینه‌ها'],
+      tuition: ['کنترل شهریه', 'پیگیری وضعیت پرداخت شهریه'],
+      consent: ['رضایت‌نامه', 'ثبت و پیگیری رضایت اولیا'],
+      reports: ['گزارشات', 'نمرات، حضور و تحلیل هوشمند']
+    };
+    if (titles[tab]) { document.getElementById('pageTitle').textContent = titles[tab][0]; document.getElementById('pageSub').textContent = titles[tab][1]; }
+    if (tab === 'reports') { renderTeacherGradesTable(); renderTeacherHomeworksTable(); renderTeacherAttendanceTable(); renderReportsTable(); updateSchoolStats(); updateSmartInsights(); updateAIInsights(); }
+    if (tab === 'accounting') renderAccountingTab();
+    if (tab === 'tuition') renderTuitionTab();
+    if (tab === 'consent') renderConsentTab();
+    renderDashboardCharts(); renderHierarchy(); fillSelects(); fillReportSelects(); updateFilterClassSelect();
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('sidebarOverlay').classList.remove('show');
+  });
+});
+
+// ===== THEME =====
+document.getElementById('themeToggle').addEventListener('click', function() {
+  let current = document.documentElement.getAttribute('data-theme');
+  let theme = current === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', theme);
+  this.innerHTML = '<i class="fas ' + (theme === 'dark' ? 'fa-sun' : 'fa-moon') + '"></i>';
+  localStorage.setItem('theme', theme);
+});
+let savedTheme = localStorage.getItem('theme') || 'light';
+document.documentElement.setAttribute('data-theme', savedTheme);
+document.getElementById('themeToggle').innerHTML = '<i class="fas ' + (savedTheme === 'dark' ? 'fa-sun' : 'fa-moon') + '"></i>';
+
+// ===== MOBILE SIDEBAR =====
+window.addEventListener('resize', function() {
+  let btn = document.getElementById('sidebarToggle');
+  if (window.innerWidth <= 1100) { btn.style.display = 'inline-flex'; } else { btn.style.display = 'none'; document.getElementById('sidebar').classList.remove('open'); document.getElementById('sidebarOverlay').classList.remove('show'); }
+});
+document.getElementById('sidebarToggle').addEventListener('click', function() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebarOverlay').classList.toggle('show');
+});
+document.getElementById('sidebarOverlay').addEventListener('click', function() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('show');
+});
+
+// ============================================================
+// BUTTON EVENTS
+// ============================================================
+document.getElementById('addClassBtn')?.addEventListener('click', function() {
+  let name = document.getElementById('className').value.trim();
+  if (!name) { showToast('❌ نام کلاس را وارد کنید', true); return; }
+  if (appData.classes.some(c => c.name === name)) { showToast('❌ کلاس تکراری!', true); return; }
+  appData.classes.push({ id: uid('c'), name: name, courses: [] });
+  saveData(); renderAll(); document.getElementById('className').value = ''; showToast('✅ کلاس ' + name + ' با موفقیت ایجاد شد');
+});
+
+document.getElementById('addCourseBtn')?.addEventListener('click', function() {
+  let classId = document.getElementById('selectClassForCourse').value;
+  let name = document.getElementById('courseName').value.trim();
+  if (!classId || !name) { showToast('❌ کلاس و نام درس را انتخاب کنید', true); return; }
+  let c = appData.classes.find(x => x.id === classId);
+  if (!c) return;
+  if (!c.courses) c.courses = [];
+  if (c.courses.some(x => x.courseName === name)) { showToast('❌ درس تکراری!', true); return; }
+  c.courses.push({ courseName: name, teacherId: null });
+  saveData(); renderAll(); document.getElementById('courseName').value = ''; showToast('✅ درس ' + name + ' با موفقیت اضافه شد');
+});
+
+document.getElementById('assignTeacherBtn')?.addEventListener('click', function() {
+  let classId = document.getElementById('selectClassForTeacher').value;
+  let courseName = document.getElementById('selectCourseForTeacher').value;
+  let teacherId = document.getElementById('selectTeacherForAssign').value;
+  if (!classId || !courseName || !teacherId) { showToast('❌ همه موارد را انتخاب کنید', true); return; }
+  let c = appData.classes.find(x => x.id === classId);
+  let crs = c.courses.find(x => x.courseName === courseName);
+  if (crs) { crs.teacherId = teacherId; saveData(); renderAll(); showToast('✅ معلم با موفقیت تخصیص داده شد'); }
+});
+
+document.getElementById('addStudentBtn')?.addEventListener('click', function() {
+  let name = document.getElementById('stdFullname').value.trim();
+  let code = document.getElementById('stdNationalCode').value.trim();
+  let classId = document.getElementById('stdClassSelect').value;
+  let className = appData.classes.find(c => c.id === classId)?.name;
+  if (!name || !code || !className) { showToast('❌ نام، کد ملی و کلاس الزامی است', true); return; }
+  if (appData.students.some(s => s.nationalCode === code)) { showToast('❌ کد ملی تکراری!', true); return; }
+  appData.students.push({ fullname: name, nationalCode: code, birthYear: document.getElementById('stdBirthYear').value, address: document.getElementById('stdAddress').value, phone: document.getElementById('stdPhone').value, parentPhone: document.getElementById('stdParentPhone').value, className: className, password: document.getElementById('stdPassword').value || '123456' });
+  saveData(); renderAll();
+  ['stdFullname', 'stdNationalCode', 'stdBirthYear', 'stdAddress', 'stdPhone', 'stdParentPhone'].forEach(id => document.getElementById(id).value = '');
+  showToast('✅ دانش‌آموز ' + name + ' با موفقیت ثبت شد');
+});
+
+document.getElementById('addTeacherBtn')?.addEventListener('click', function() {
+  let name = document.getElementById('teacherName').value.trim();
+  let code = document.getElementById('teacherCode').value.trim();
+  if (!name || !code) { showToast('❌ نام و کد پرسنلی الزامی است', true); return; }
+  if (appData.teachers.some(t => t.code === code)) { showToast('❌ کد تکراری!', true); return; }
+  appData.teachers.push({ id: uid('tch'), name: name, code: code, phone: document.getElementById('teacherPhone').value, password: document.getElementById('teacherPassword').value || 'teacher123' });
+  saveData(); renderAll();
+  ['teacherName', 'teacherCode', 'teacherPhone'].forEach(id => document.getElementById(id).value = '');
+  showToast('✅ معلم ' + name + ' با موفقیت ثبت شد');
+});
+
+document.getElementById('addSupervisorBtn')?.addEventListener('click', function() {
+  let name = document.getElementById('supName').value.trim();
+  let code = document.getElementById('supCode').value.trim();
+  if (!name || !code) { showToast('❌ نام و کد پرسنلی الزامی است', true); return; }
+  if (appData.supervisors.some(s => s.code === code)) { showToast('❌ کد تکراری!', true); return; }
+  appData.supervisors.push({ id: uid('sup'), name: name, code: code, phone: document.getElementById('supPhone').value, password: document.getElementById('supPassword').value || 'nazem123' });
+  saveData(); renderAll();
+  ['supName', 'supCode', 'supPhone'].forEach(id => document.getElementById(id).value = '');
+  showToast('✅ ناظم ' + name + ' با موفقیت ثبت شد');
+});
+
+// ===== ACCOUNTING EVENTS =====
+document.getElementById('txType')?.addEventListener('change', function() { fillCategorySelects(); });
+
+document.getElementById('addTxBtn')?.addEventListener('click', function() {
+  let type = document.getElementById('txType').value;
+  let category = document.getElementById('txCategory').value;
+  let amount = Number(document.getElementById('txAmount').value);
+  let date = document.getElementById('txDate').value || todayStr();
+  let desc = document.getElementById('txDesc').value;
+  if (!category || !amount || amount <= 0) { showToast('❌ دسته و مبلغ معتبر وارد کنید', true); return; }
+  appData.transactions.push({ id: uid('tx'), type: type, category: category, amount: amount, date: date, description: desc });
+  saveData(); renderAccountingTab();
+  document.getElementById('txAmount').value = '';
+  document.getElementById('txDesc').value = '';
+  showToast('✅ تراکنش با موفقیت ثبت شد');
+});
+
+document.getElementById('addCategoryBtn')?.addEventListener('click', function() {
+  let name = document.getElementById('newCategoryName').value.trim();
+  let type = document.getElementById('txType').value;
+  if (!name) { showToast('❌ نام دسته‌بندی را وارد کنید', true); return; }
+  if (appData.categories[type].includes(name)) { showToast('❌ این دسته‌بندی وجود دارد', true); return; }
+  appData.categories[type].push(name);
+  saveData(); fillCategorySelects();
+  document.getElementById('newCategoryName').value = '';
+  showToast('✅ دسته‌بندی «' + name + '» اضافه شد');
+});
+
+// ===== TUITION EVENTS =====
+document.getElementById('searchTui')?.addEventListener('input', renderTuitionTable);
+document.getElementById('filterTuiClass')?.addEventListener('change', renderTuitionTable);
+document.getElementById('filterTuiStatus')?.addEventListener('change', renderTuitionTable);
+
+// ===== OTHER EVENTS =====
+document.getElementById('exportFullSchoolExcelBtn')?.addEventListener('click', exportFullSchoolExcel);
+document.getElementById('exportTuitionExcelBtn')?.addEventListener('click', function() {
+  let data = appData.students.map(s => {
+    let r = getTuitionRecord(s.nationalCode);
+    return { 'نام': s.fullname, 'کد ملی': s.nationalCode, 'کلاس': s.className || '-', 'کل شهریه': r ? toNum(r.totalTuition) : 0, 'تخفیف': r ? toNum(r.discount || 0) : 0, 'پرداخت شده': getTuitionPaid(s.nationalCode), 'مانده': getTuitionRemaining(s.nationalCode), 'وضعیت': getTuitionStatus(s.nationalCode), 'سررسید': r ? (r.dueDate || '-') : '-' };
+  });
+  let wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data), 'وضعیت شهریه');
+  let debtors = data.filter(d => d['وضعیت'] === 'معوقه' || d['وضعیت'] === 'پرداخت جزئی');
+  if (debtors.length) { XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(debtors), 'بدهکاران'); }
+  XLSX.writeFile(wb, 'وضعیت_شهریه_' + todayStr() + '.xlsx');
+  showToast('✅ خروجی اکسل شهریه ذخیره شد');
+});
+
+document.getElementById('exportTxExcelBtn')?.addEventListener('click', function() {
+  let data = appData.transactions.map(t => ({ 'نوع': t.type === 'income' ? 'درآمد' : 'هزینه', 'دسته‌بندی': t.category, 'مبلغ (تومان)': t.amount, 'توضیحات': t.description || '', 'تاریخ': t.date }));
+  let wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data), 'حسابداری');
+  let inc = appData.transactions.filter(t => t.type === 'income').reduce((s, t) => s + toNum(t.amount), 0);
+  let exp = appData.transactions.filter(t => t.type === 'expense').reduce((s, t) => s + toNum(t.amount), 0);
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([['خلاصه مالی'], ['مجموع درآمد', inc], ['مجموع هزینه', exp], ['مانده', inc - exp]]), 'خلاصه');
+  XLSX.writeFile(wb, 'حسابداری_' + todayStr() + '.xlsx');
+  showToast('✅ خروجی اکسل حسابداری ذخیره شد');
+});
+
+document.getElementById('searchStudent')?.addEventListener('input', renderStudentsTable);
+document.getElementById('filterClass')?.addEventListener('change', renderStudentsTable);
+document.getElementById('sortStudentsBy')?.addEventListener('change', renderStudentsTable);
+document.getElementById('searchTeacher')?.addEventListener('input', renderTeachersTable);
+document.getElementById('searchSupervisor')?.addEventListener('input', renderSupervisorsTable);
+document.getElementById('searchReport')?.addEventListener('input', renderReportsTable);
+document.getElementById('searchHierarchy')?.addEventListener('input', function(e) { renderHierarchy(e.target.value); });
+document.getElementById('searchStudentCard')?.addEventListener('input', fillReportSelects);
+document.getElementById('searchTeacherGrades')?.addEventListener('input', renderTeacherGradesTable);
+document.getElementById('filterTeacherClass')?.addEventListener('change', renderTeacherGradesTable);
+document.getElementById('filterTeacherName')?.addEventListener('change', renderTeacherGradesTable);
+document.getElementById('searchHomework')?.addEventListener('input', renderTeacherHomeworksTable);
+document.getElementById('searchTeacherAttendance')?.addEventListener('input', renderTeacherAttendanceTable);
+document.getElementById('filterAttendanceType')?.addEventListener('change', renderTeacherAttendanceTable);
+document.getElementById('searchTx')?.addEventListener('input', renderTxTable);
+document.getElementById('filterTxType')?.addEventListener('change', renderTxTable);
+document.getElementById('filterTxCategory')?.addEventListener('change', renderTxTable);
+
+document.getElementById('selectClassForTeacher')?.addEventListener('change', function() {
+  let classId = this.value;
+  let c = appData.classes.find(x => x.id === classId);
+  let sel = document.getElementById('selectCourseForTeacher');
+  sel.innerHTML = '<option value="">انتخاب درس</option>' + (c ? c.courses.map(crs => '<option value="' + crs.courseName + '">' + crs.courseName + '</option>').join('') : '');
+});
+
+document.getElementById('cardStudentSelect')?.addEventListener('change', function() {
+  let id = this.value;
+  let s = appData.students.find(x => x.nationalCode === id);
+  let el = document.getElementById('studentCard');
+  if (!s) { el.innerHTML = '<div style="text-align:center;padding:0.5rem;color:var(--text-secondary);">دانش‌آموزی انتخاب نشده</div>'; return; }
+  let g = appData.grades.filter(x => x.studentId === id);
+  let r = appData.reports.filter(x => x.studentId === id);
+  let present = r.filter(x => x.type === 'present').length;
+  let absent = r.filter(x => x.type === 'absent').length;
+  let excused = r.filter(x => x.type === 'excused').length;
+  let late = r.filter(x => x.type === 'late').length;
+  let positive = r.filter(x => x.type === 'positive').length;
+  let negative = r.filter(x => x.type === 'negative').length;
+  let score = calcScore(id);
+  let avg = calcAvg(id);
+  el.innerHTML = '<div style="text-align:center;border-bottom:1px solid var(--border);padding-bottom:0.3rem;margin-bottom:0.3rem;"><div style="font-weight:700;">' + s.fullname + '</div><div style="font-size:0.7rem;color:var(--text-secondary);">' + (s.className || '') + ' | کد: ' + s.nationalCode + '</div></div><div style="display:grid;grid-template-columns:repeat(6,1fr);gap:0.1rem;text-align:center;font-size:0.6rem;margin-bottom:0.3rem;"><div style="padding:0.1rem;background:#d1fae5;border-radius:4px;"><div style="font-weight:700;color:var(--success);">' + present + '</div>حضور</div><div style="padding:0.1rem;background:#fee2e2;border-radius:4px;"><div style="font-weight:700;color:var(--danger);">' + absent + '</div>غیبت</div><div style="padding:0.1rem;background:var(--primary-bg);border-radius:4px;"><div style="font-weight:700;color:var(--primary);">' + excused + '</div>موجه</div><div style="padding:0.1rem;background:#fef3c7;border-radius:4px;"><div style="font-weight:700;color:var(--warning);">' + late + '</div>تأخیر</div><div style="padding:0.1rem;background:var(--primary-bg);border-radius:4px;"><div style="font-weight:700;color:var(--primary);">' + positive + '</div>مثبت</div><div style="padding:0.1rem;background:#ede9fe;border-radius:4px;"><div style="font-weight:700;color:var(--secondary);">' + negative + '</div>تخلف</div></div><div style="text-align:center;padding:0.2rem;background:var(--bg);border-radius:6px;font-size:0.8rem;"><span style="font-weight:700;">معدل:</span> <span style="font-weight:800;color:' + (avg >= 17 ? 'var(--success)' : avg >= 14 ? 'var(--primary)' : avg >= 10 ? 'var(--warning)' : 'var(--danger)') + ';">' + avg + '</span> | <span style="font-weight:700;">انضباط:</span> <span style="font-weight:800;color:' + (score >= 15 ? 'var(--success)' : 'var(--danger)') + ';">' + score + '</span></div><button onclick="showStudentCard(\'' + s.nationalCode + '\')" class="btn btn-primary" style="width:100%;margin-top:0.3rem;justify-content:center;font-size:0.7rem;"><i class="fas fa-file-alt"></i> کارنامه کامل</button>';
+});
+
+document.getElementById('excelFileInput')?.addEventListener('change', function(e) {
+  let file = e.target.files[0];
+  if (!file) return;
+  let reader = new FileReader();
+  reader.onload = function(ev) {
+    try {
+      let data = new Uint8Array(ev.target.result);
+      let wb = XLSX.read(data, { type: 'array' });
+      let sheet = wb.Sheets[wb.SheetNames[0]];
+      let rows = XLSX.utils.sheet_to_json(sheet);
+      let added = 0, skipped = 0;
+      for (let row of rows) {
+        let name = row['نام'] || row['fullname'] || row['نام کامل'] || '';
+        let code = row['کد ملی'] || row['nationalCode'] || row['کد'] || '';
+        let cls = row['کلاس'] || row['class'] || row['classname'] || '';
+        let phone = row['تلفن'] || row['phone'] || '';
+        let parent = row['تلفن والدین'] || row['parentPhone'] || '';
+        let addr = row['آدرس'] || row['address'] || '';
+        let birth = row['سال تولد'] || row['birthYear'] || '';
+        if (name && code && cls) {
+          if (!appData.students.some(s => s.nationalCode === code)) {
+            appData.students.push({ fullname: name, nationalCode: code, birthYear: birth, address: addr, phone: phone, parentPhone: parent, className: cls, password: '123456' });
+            added++;
+          } else skipped++;
+        }
+      }
+      saveData(); renderAll(); showToast('✅ ' + added + ' دانش‌آموز اضافه شد. ' + skipped + ' تکراری');
+    } catch (err) { showToast('❌ خطا در خواندن فایل', true); }
+  };
+  reader.readAsArrayBuffer(file);
+});
+document.getElementById('importExcelBtn')?.addEventListener('click', function() { document.getElementById('excelFileInput').click(); });
+
+document.getElementById('exportGradesDataBtn')?.addEventListener('click', function() {
+  let data = appData.grades.map(g => {
+    let s = appData.students.find(x => x.nationalCode === g.studentId);
+    let t = appData.teachers.find(x => x.id === g.teacherId);
+    return { 'معلم': t?.name || '', 'کد معلم': t?.code || '', 'دانش‌آموز': s?.fullname || '', 'کلاس': s?.className || '', 'درس': g.courseName, 'نوع': g.type, 'عنوان': g.title || '', 'نمره': g.score, 'توضیحات': g.note || '', 'تاریخ': g.date };
+  });
+  let wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data), 'نمرات');
+  XLSX.writeFile(wb, 'نمرات_معلمان_' + todayStr() + '.xlsx');
+  showToast('✅ خروجی اکسل نمرات گرفته شد');
+});
+
+// ============================================================
+// INIT
+// ============================================================
+loadData();
+document.querySelector('.sidebar-link.active')?.click();
+console.log('✅ ناظم‌یار نسخه کامل با رضایت‌نامه پیشرفته بارگذاری شد!');
+</script>
+</body>
+</html>
