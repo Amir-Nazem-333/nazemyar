@@ -356,38 +356,28 @@ tbody tr:hover td { background: var(--bg); }
       </div>
     </div>
 
-    <!-- ===== CONSENT ===== -->
+    <!-- CONSENT -->
     <div id="consentTab" class="tab-content hidden">
       <div class="card" style="margin-bottom:1.2rem;">
         <h3 class="card-title"><i class="fas fa-file-signature" style="color:var(--warning);"></i> ایجاد رضایت‌نامه جدید</h3>
-        <p style="font-size:0.75rem;color:var(--text-secondary);margin-bottom:0.5rem;">برای اردو، بازدید علمی، انتشار تصاویر یا هر مورد دیگر که نیاز به رضایت اولیا دارد</p>
+        <p style="font-size:0.75rem;color:var(--text-secondary);margin-bottom:0.5rem;">برای اردو، بازدید علمی، انتشار تصاویر یا هر مورد دیگر</p>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-bottom:0.5rem;">
-          <div><label>عنوان رضایت‌نامه</label><input type="text" id="consentTitle" placeholder="مثال: اردوی علمی کویر مصر" style="width:100%;"></div>
-          <div><label>مهلت پاسخ‌گویی</label><input type="text" id="consentDeadline" placeholder="مثال: ۱۴۰۴/۰۵/۱۵" style="width:100%;"></div>
-          <div><label>نوع مخاطب</label>
-            <select id="consentTargetType" style="width:100%;">
-              <option value="all">همه دانش‌آموزان</option>
-              <option value="class">یک کلاس خاص</option>
-              <option value="selected">انتخاب دانش‌آموزان</option>
-            </select>
-          </div>
-          <div id="consentClassWrap" style="display:none;"><label>انتخاب کلاس</label><select id="consentTargetClass" style="width:100%;"><option value="">انتخاب کلاس</option></select></div>
+          <div><label>عنوان</label><input type="text" id="consentTitle" placeholder="مثال: اردوی علمی" style="width:100%;"></div>
+          <div><label>مهلت</label><input type="text" id="consentDeadline" placeholder="مثال: ۱۴۰۴/۰۵/۱۵" style="width:100%;"></div>
+          <div><label>نوع مخاطب</label><select id="consentTargetType" style="width:100%;"><option value="all">همه دانش‌آموزان</option><option value="class">یک کلاس خاص</option><option value="selected">انتخاب دانش‌آموزان</option></select></div>
+          <div id="consentClassWrap" style="display:none;"><label>کلاس</label><select id="consentTargetClass" style="width:100%;"><option value="">انتخاب کلاس</option></select></div>
         </div>
         <div id="consentStudentsWrap" style="display:none;margin-bottom:0.5rem;">
-          <label>انتخاب دانش‌آموزان</label>
-          <select id="consentTargetStudents" multiple style="width:100%;height:100px;">
-            <option value="">ابتدا دانش‌آموزان را انتخاب کنید</option>
-          </select>
-          <p style="font-size:0.6rem;color:var(--text-secondary);margin-top:0.2rem;">برای انتخاب چند دانش‌آموز، کلید Ctrl را نگه دارید</p>
+          <label>انتخاب دانش‌آموزان (Ctrl+Click)</label>
+          <select id="consentTargetStudents" multiple style="width:100%;height:100px;"></select>
         </div>
-        <div style="margin-bottom:0.5rem;"><label>متن رضایت‌نامه</label><textarea id="consentText" rows="4" style="width:100%;">اینجانب ولیّ دانش‌آموز، پس از مطالعه کامل جزئیات برنامه فوق، رضایت آگاهانه خود را برای شرکت فرزندم اعلام می‌نمایم و مسئولیت هرگونه حادثه خارج از تقصیر مدرسه را می‌پذیرم.</textarea></div>
+        <div style="margin-bottom:0.5rem;"><label>متن رضایت‌نامه</label><textarea id="consentText" rows="4" style="width:100%;">اینجانب ولیّ دانش‌آموز، پس از مطالعه کامل جزئیات برنامه فوق، رضایت آگاهانه خود را برای شرکت فرزندم اعلام می‌نمایم.</textarea></div>
         <button id="createConsentBtn" class="btn btn-warning"><i class="fas fa-plus"></i> ایجاد رضایت‌نامه</button>
       </div>
-
       <div id="consentFormsList" style="space-y:0.8rem;"></div>
     </div>
 
-    <!-- ===== REPORTS ===== -->
+    <!-- REPORTS -->
     <div id="reportsTab" class="tab-content hidden">
       <div class="grid-2">
         <div class="card">
@@ -569,9 +559,9 @@ function calcAvg(studentId) {
   return Math.round((g.reduce((a, b) => a + b.score, 0) / g.length) * 10) / 10;
 }
 
-function saveData() { localStorage.setItem('nazemyar_v18', JSON.stringify(appData)); }
+function saveData() { localStorage.setItem('nazemyar_v19', JSON.stringify(appData)); }
 function loadData() {
-  let s = localStorage.getItem('nazemyar_v18');
+  let s = localStorage.getItem('nazemyar_v19');
   if (s) { let p = JSON.parse(s); Object.assign(appData, p); }
   renderAll();
 }
@@ -655,7 +645,7 @@ function createModal(title, content, maxWidth) {
 }
 
 // ============================================================
-// RENDER FUNCTIONS
+// RENDER FUNCTIONS - همه پنل‌ها با یکپارچگی کامل
 // ============================================================
 function renderAll() {
   renderDashboard();
@@ -665,21 +655,15 @@ function renderAll() {
   renderStudentsTable();
   renderTeachersTable();
   renderSupervisorsTable();
-  renderReportsTable();
-  renderTeacherGradesTable();
-  renderTeacherHomeworksTable();
-  renderTeacherAttendanceTable();
-  fillSelects();
-  renderDashboardCharts();
-  renderHierarchy();
-  fillReportSelects();
-  updateFilterClassSelect();
-  updateSchoolStats();
-  updateSmartInsights();
-  updateAIInsights();
   renderAccountingTab();
   renderTuitionTab();
   renderConsentTab();
+  renderReportsAll();
+  renderHierarchy();
+  fillSelects();
+  renderDashboardCharts();
+  updateFilterClassSelect();
+  fillReportSelects();
 }
 
 // ===== DASHBOARD =====
@@ -991,270 +975,6 @@ window.deleteSupervisor = function(id) {
 };
 
 // ============================================================
-// ===== REPORTS =====
-// ============================================================
-
-// ===== نمایش کارنامه دانش‌آموز =====
-function renderStudentCard() {
-  let studentId = document.getElementById('cardStudentSelect')?.value;
-  let el = document.getElementById('studentCard');
-  if (!el) return;
-  
-  if (!studentId) {
-    el.innerHTML = '<div style="text-align:center;padding:0.5rem;color:var(--text-secondary);">لطفاً یک دانش‌آموز را انتخاب کنید</div>';
-    return;
-  }
-  
-  let s = appData.students.find(x => x.nationalCode === studentId);
-  if (!s) {
-    el.innerHTML = '<div style="text-align:center;padding:0.5rem;color:var(--text-secondary);">دانش‌آموزی یافت نشد</div>';
-    return;
-  }
-  
-  let g = appData.grades.filter(x => x.studentId === studentId);
-  let r = appData.reports.filter(x => x.studentId === studentId);
-  let present = r.filter(x => x.type === 'present').length;
-  let absent = r.filter(x => x.type === 'absent').length;
-  let excused = r.filter(x => x.type === 'excused').length;
-  let late = r.filter(x => x.type === 'late').length;
-  let positive = r.filter(x => x.type === 'positive').length;
-  let negative = r.filter(x => x.type === 'negative').length;
-  let score = calcScore(studentId);
-  let avg = calcAvg(studentId);
-  
-  el.innerHTML = `
-    <div style="text-align:center;border-bottom:1px solid var(--border);padding-bottom:0.3rem;margin-bottom:0.3rem;">
-      <div style="font-weight:700;font-size:1rem;">${s.fullname}</div>
-      <div style="font-size:0.7rem;color:var(--text-secondary);">${s.className || ''} | کد: ${s.nationalCode}</div>
-    </div>
-    <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:0.1rem;text-align:center;font-size:0.55rem;margin-bottom:0.3rem;">
-      <div style="padding:0.1rem;background:#d1fae5;border-radius:4px;"><div style="font-weight:700;color:var(--success);">${present}</div>حضور</div>
-      <div style="padding:0.1rem;background:#fee2e2;border-radius:4px;"><div style="font-weight:700;color:var(--danger);">${absent}</div>غیبت</div>
-      <div style="padding:0.1rem;background:var(--primary-bg);border-radius:4px;"><div style="font-weight:700;color:var(--primary);">${excused}</div>موجه</div>
-      <div style="padding:0.1rem;background:#fef3c7;border-radius:4px;"><div style="font-weight:700;color:var(--warning);">${late}</div>تأخیر</div>
-      <div style="padding:0.1rem;background:var(--primary-bg);border-radius:4px;"><div style="font-weight:700;color:var(--primary);">${positive}</div>مثبت</div>
-      <div style="padding:0.1rem;background:#ede9fe;border-radius:4px;"><div style="font-weight:700;color:var(--secondary);">${negative}</div>تخلف</div>
-    </div>
-    <div style="text-align:center;padding:0.2rem;background:var(--bg);border-radius:6px;font-size:0.8rem;">
-      <span style="font-weight:700;">معدل:</span> <span style="font-weight:800;color:${avg >= 17 ? 'var(--success)' : avg >= 14 ? 'var(--primary)' : avg >= 10 ? 'var(--warning)' : 'var(--danger)'};">${avg}</span>
-      <span style="margin:0 0.3rem;">|</span>
-      <span style="font-weight:700;">انضباط:</span> <span style="font-weight:800;color:${score >= 15 ? 'var(--success)' : 'var(--danger)'};">${score}</span>
-    </div>
-    <div style="margin-top:0.3rem;font-size:0.7rem;">
-      <span style="font-weight:700;">نمرات:</span>
-      ${g.length ? g.map(x => '<span class="badge badge-info" style="margin-left:0.2rem;">' + x.courseName + ': ' + x.score + '</span>').join('') : '<span style="color:var(--text-secondary);">هیچ نمره‌ای ثبت نشده</span>'}
-    </div>
-    <button onclick="showStudentCard('${studentId}')" class="btn btn-primary" style="width:100%;margin-top:0.3rem;justify-content:center;font-size:0.7rem;padding:0.2rem 0.5rem;">
-      <i class="fas fa-file-alt"></i> مشاهده کارنامه کامل
-    </button>
-  `;
-}
-
-// ===== پر کردن لیست دانش‌آموزان در کارنامه =====
-function fillReportSelects() {
-  let search = document.getElementById('searchStudentCard')?.value.toLowerCase() || '';
-  let filtered = appData.students.filter(s => s.fullname.toLowerCase().includes(search) || s.nationalCode.includes(search));
-  let sel = document.getElementById('cardStudentSelect');
-  if (sel) {
-    let cur = sel.value;
-    sel.innerHTML = '<option value="">انتخاب دانش‌آموز</option>' + 
-      filtered.map(s => `<option value="${s.nationalCode}">${s.fullname} - ${s.className || 'بدون کلاس'}</option>`).join('');
-    if (cur && appData.students.some(s => s.nationalCode === cur)) sel.value = cur;
-    // نمایش کارنامه اگر دانش‌آموزی انتخاب شده باشد
-    if (sel.value) renderStudentCard();
-  }
-}
-
-// ===== آمار کلی مدرسه =====
-function updateSchoolStats() {
-  let allG = appData.grades;
-  let avg = allG.length ? (allG.reduce((s, g) => s + g.score, 0) / allG.length).toFixed(1) : 0;
-  document.getElementById('schoolAvgGrade').textContent = avg;
-  
-  let allR = appData.reports;
-  let present = allR.filter(r => r.type === 'present').length;
-  let total = allR.filter(r => ['present', 'absent', 'excused', 'late'].includes(r.type)).length;
-  document.getElementById('schoolAttendanceRate').textContent = total ? Math.round(present / total * 100) + '%' : '0%';
-  document.getElementById('totalGradesCount').textContent = allG.length;
-  document.getElementById('totalViolations').textContent = allR.filter(r => r.type === 'negative').length;
-}
-
-// ===== نمرات ثبت شده توسط معلمان =====
-function renderTeacherGradesTable() {
-  let search = document.getElementById('searchTeacherGrades')?.value.toLowerCase() || '';
-  let filterClass = document.getElementById('filterTeacherClass')?.value || '';
-  let filterTeacher = document.getElementById('filterTeacherName')?.value || '';
-  
-  let filtered = appData.grades.filter(g => {
-    let s = appData.students.find(x => x.nationalCode === g.studentId);
-    let t = appData.teachers.find(x => x.id === g.teacherId);
-    let ms = !search || (t?.name?.toLowerCase().includes(search)) || (s?.fullname?.toLowerCase().includes(search)) || (g.courseName?.toLowerCase().includes(search));
-    let mc = !filterClass || (s && s.className === filterClass);
-    let mt = !filterTeacher || (t && t.id === filterTeacher);
-    return ms && mc && mt;
-  });
-  filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
-  
-  let tbody = document.getElementById('teacherGradesTable');
-  if (!tbody) return;
-  
-  if (!filtered.length) {
-    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:1rem;color:var(--text-secondary);">هیچ نمره‌ای ثبت نشده است</td></tr>';
-    document.getElementById('teacherGradesCount').textContent = '0';
-    return;
-  }
-  
-  tbody.innerHTML = filtered.map(g => {
-    let s = appData.students.find(x => x.nationalCode === g.studentId);
-    let t = appData.teachers.find(x => x.id === g.teacherId);
-    let typeText = { exam: 'امتحان', homework: 'تکلیف', activity: 'فعالیت', project: 'پروژه' }[g.type] || g.type;
-    let cls = g.score >= 17 ? 'grade-excellent' : g.score >= 14 ? 'grade-good' : g.score >= 10 ? 'grade-average' : 'grade-poor';
-    return '<tr><td>' + (t?.name || '-') + '</td><td>' + (s?.fullname || '-') + '</td><td>' + (s?.className || '-') + '</td><td style="font-weight:600;">' + g.courseName + '</td><td>' + typeText + '</td><td>' + (g.title || '-') + '</td><td><span class="' + cls + '">' + g.score + '</span></td><td style="color:var(--text-secondary);">' + g.date + '</td></tr>';
-  }).join('');
-  document.getElementById('teacherGradesCount').textContent = filtered.length;
-}
-
-// ===== تکالیف =====
-function renderTeacherHomeworksTable() {
-  let search = document.getElementById('searchHomework')?.value.toLowerCase() || '';
-  let filtered = appData.homeworks.filter(h => {
-    let t = appData.teachers.find(x => x.id === h.teacherId);
-    return !search || h.title.toLowerCase().includes(search) || h.className.toLowerCase().includes(search) || (t?.name?.toLowerCase().includes(search));
-  });
-  filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
-  let tbody = document.getElementById('teacherHomeworksTable');
-  if (!tbody) return;
-  if (!filtered.length) {
-    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:1rem;color:var(--text-secondary);">هیچ تکلیفی ثبت نشده است</td></tr>';
-    return;
-  }
-  tbody.innerHTML = filtered.map(h => {
-    let t = appData.teachers.find(x => x.id === h.teacherId);
-    return '<tr><td>' + (t?.name || '-') + '</td><td>' + h.className + '</td><td>' + h.courseName + '</td><td style="font-weight:600;">' + h.title + '</td><td style="max-width:120px;">' + (h.description || '-') + '</td><td>' + h.deadline + '</td><td style="color:var(--text-secondary);">' + h.date + '</td></tr>';
-  }).join('');
-}
-
-// ===== حضور و غیاب =====
-function renderTeacherAttendanceTable() {
-  let search = document.getElementById('searchTeacherAttendance')?.value.toLowerCase() || '';
-  let filterType = document.getElementById('filterAttendanceType')?.value || '';
-  let filtered = appData.reports.filter(r => {
-    let s = appData.students.find(x => x.nationalCode === r.studentId);
-    let ms = !search || (s?.fullname?.toLowerCase().includes(search)) || (s?.className?.toLowerCase().includes(search));
-    let mt = !filterType || r.type === filterType;
-    return ms && mt && ['present', 'absent', 'late', 'excused'].includes(r.type);
-  });
-  filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
-  let tbody = document.getElementById('teacherAttendanceTable');
-  if (!tbody) return;
-  if (!filtered.length) {
-    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:1rem;color:var(--text-secondary);">هیچ گزارشی ثبت نشده است</td></tr>';
-    return;
-  }
-  let typeMap = { present: '✅ حاضر', absent: '❌ غایب', late: '⏰ تأخیر', excused: '📋 غیبت موجه' };
-  let colorMap = { present: 'color:var(--success);', absent: 'color:var(--danger);', late: 'color:var(--warning);', excused: 'color:var(--primary);' };
-  tbody.innerHTML = filtered.map(r => {
-    let s = appData.students.find(x => x.nationalCode === r.studentId);
-    return '<tr><td>' + (r.reporter || 'معلم/ناظم') + '</td><td>' + (s?.fullname || '-') + '</td><td>' + (s?.className || '-') + '</td><td style="font-weight:600;' + (colorMap[r.type] || '') + '">' + (typeMap[r.type] || r.type) + '</td><td>' + r.date + '</td><td style="max-width:120px;">' + (r.description || '-') + '</td></tr>';
-  }).join('');
-}
-
-// ===== گزارشات انضباطی =====
-function renderReportsTable() {
-  let search = document.getElementById('searchReport')?.value.toLowerCase() || '';
-  let filtered = appData.reports.filter(r => {
-    let s = appData.students.find(x => x.nationalCode === r.studentId);
-    return s?.fullname.toLowerCase().includes(search) || s?.className?.toLowerCase().includes(search);
-  });
-  filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
-  let tbody = document.getElementById('allReportsTable');
-  if (!tbody) return;
-  if (!filtered.length) {
-    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:1rem;color:var(--text-secondary);">هیچ گزارشی یافت نشد</td></tr>';
-    return;
-  }
-  let typeMap = { present: '✅ حضور', absent: '❌ غیبت', excused: '📋 غیبت موجه', late: '⏰ تأخیر', positive: '🌟 رفتار مثبت', negative: '⚠️ تخلف' };
-  let colorMap = { present: 'color:var(--success);', absent: 'color:var(--danger);', excused: 'color:var(--primary);', late: 'color:var(--warning);', positive: 'color:var(--primary);', negative: 'color:var(--danger);' };
-  tbody.innerHTML = filtered.map(r => {
-    let s = appData.students.find(x => x.nationalCode === r.studentId);
-    return '<tr><td>' + (s?.fullname || r.studentId) + '</td><td>' + (s?.className || '-') + '</td><td style="font-weight:600;' + (colorMap[r.type] || '') + '">' + (typeMap[r.type] || r.type) + '</td><td>' + r.date + '</td><td>' + (r.description || '-') + '</td><td>' + (r.reporter || 'ناظم') + '</td></tr>';
-  }).join('');
-}
-
-// ============================================================
-// AI INSIGHTS
-// ============================================================
-function updateAIInsights() {
-  let allG = appData.grades;
-  let avg = allG.length ? (allG.reduce((s, g) => s + g.score, 0) / allG.length).toFixed(1) : 0;
-  let totalS = appData.students.length;
-  let totalT = appData.teachers.length;
-  let neg = appData.reports.filter(r => r.type === 'negative').length;
-  let absent = appData.reports.filter(r => r.type === 'absent' || r.type === 'excused').length;
-  
-  let summary = '📌 وضعیت کلی: مدرسه با ' + totalS + ' دانش‌آموز و ' + totalT + ' معلم فعال است. میانگین نمرات ' + avg + ' از 20 می‌باشد. ';
-  if (avg >= 17) summary += 'وضعیت تحصیلی عالی است! 🎉';
-  else if (avg >= 14) summary += 'وضعیت تحصیلی خوب است. قابل قبول ✅';
-  else if (avg >= 10) summary += 'وضعیت تحصیلی متوسط است. نیاز به بهبود دارد ⚠️';
-  else summary += 'وضعیت تحصیلی ضعیف است. نیاز به مداخله فوری ❗';
-  if (neg > 10) summary += ' تعداد تخلفات (' + neg + ') نسبتاً بالاست.';
-  document.getElementById('aiSummary').textContent = summary;
-  
-  let sugg = [];
-  if (avg < 14) sugg.push('برگزاری کلاس‌های جبرانی برای دروس ضعیف');
-  if (neg > totalS * 0.5) sugg.push('برگزاری جلسات انضباطی و فرهنگی');
-  if (absent > totalS * 2) sugg.push('پیگیری علت غیبت‌های مکرر دانش‌آموزان');
-  if (appData.classes.length < 3) sugg.push('توسعه کلاس‌های جدید برای تنوع آموزشی');
-  if (!sugg.length) sugg.push('وضعیت خوب است! همین مسیر را ادامه دهید.');
-  document.getElementById('aiSuggestions').innerHTML = sugg.map(s => '• ' + s).join('<br>');
-  
-  let trends = {};
-  appData.grades.forEach(g => { if (!trends[g.courseName]) trends[g.courseName] = []; trends[g.courseName].push(g.score); });
-  let th = '';
-  for (let c in trends) {
-    let s = trends[c];
-    if (s.length >= 3) { let r = s.slice(-3); let up = r[2] > r[0]; th += '• ' + c + ': ' + (up ? '📈 صعودی' : '📉 نزولی') + ' (' + r[0] + ' → ' + r[2] + ')<br>'; }
-  }
-  document.getElementById('aiTrends').innerHTML = th || 'داده کافی برای تحلیل روند وجود ندارد.';
-  
-  let alerts = [];
-  let absentMap = {};
-  appData.reports.filter(r => r.type === 'absent').forEach(r => { absentMap[r.studentId] = (absentMap[r.studentId] || 0) + 1; });
-  let high = Object.values(absentMap).filter(v => v >= 5).length;
-  if (high) alerts.push('⚠️ ' + high + ' دانش‌آموز با غیبت بیش از ۵ جلسه');
-  if (avg < 12) alerts.push('⚠️ میانگین نمرات پایین‌تر از حد قابل قبول');
-  if (neg > 20) alerts.push('⚠️ افزایش چشمگیر تخلفات انضباطی');
-  let debtors = appData.students.filter(s => getTuitionStatus(s.nationalCode) === 'معوقه').length;
-  if (debtors > 0) alerts.push('⚠️ ' + debtors + ' دانش‌آموز دارای شهریه معوقه هستند');
-  if (!alerts.length) alerts.push('✅ هیچ هشدار جدی وجود ندارد');
-  document.getElementById('aiAlerts').innerHTML = alerts.map(a => '• ' + a).join('<br>');
-}
-
-function updateSmartInsights() {
-  let tAvgs = {};
-  appData.teachers.forEach(t => { tAvgs[t.id] = { name: t.name, total: 0, count: 0 }; });
-  appData.grades.forEach(g => { if (tAvgs[g.teacherId]) { tAvgs[g.teacherId].total += g.score; tAvgs[g.teacherId].count++; } });
-  let best = null, bestAvg = -1;
-  for (let id in tAvgs) { let avg = tAvgs[id].count ? tAvgs[id].total / tAvgs[id].count : 0; if (avg > bestAvg) { bestAvg = avg; best = tAvgs[id].name; } }
-  document.getElementById('bestTeacherOfMonth').textContent = best ? best + ' (میانگین ' + bestAvg.toFixed(1) + ')' : '---';
-  
-  let risk = appData.students.filter(s => calcScore(s.nationalCode) < 12).length;
-  document.getElementById('studentsAtRisk').textContent = risk;
-  
-  let absentMap = {};
-  appData.reports.filter(r => r.type === 'absent').forEach(r => { absentMap[r.studentId] = (absentMap[r.studentId] || 0) + 1; });
-  let maxA = 0, maxName = '---';
-  for (let id in absentMap) { if (absentMap[id] > maxA && absentMap[id] >= 3) { maxA = absentMap[id]; let s = appData.students.find(x => x.nationalCode === id); maxName = s ? s.fullname + ' (' + maxA + ' غیبت)' : '---'; } }
-  document.getElementById('mostAbsentStudent').textContent = maxA >= 3 ? maxName : 'غیبت چشمگیر ندارد';
-  
-  let courseSum = {}, courseCount = {};
-  appData.grades.forEach(g => { if (!courseSum[g.courseName]) { courseSum[g.courseName] = 0; courseCount[g.courseName] = 0; } courseSum[g.courseName] += g.score; courseCount[g.courseName]++; });
-  let topC = null, topA = -1;
-  for (let c in courseSum) { let avg = courseSum[c] / courseCount[c]; if (avg > topA) { topA = avg; topC = c; } }
-  document.getElementById('topSubjectAvg').textContent = topC ? topC + ' (' + topA.toFixed(1) + ')' : '---';
-}
-
-// ============================================================
 // ACCOUNTING
 // ============================================================
 function renderAccountingTab() {
@@ -1559,17 +1279,12 @@ window.deleteTuitionPayment = function(studentId, paymentId) {
 // CONSENT
 // ============================================================
 function renderConsentTab() {
-  // پر کردن لیست دانش‌آموزان برای انتخاب
   let studentSelect = document.getElementById('consentTargetStudents');
   if (studentSelect) {
-    let currentVal = studentSelect.value;
     studentSelect.innerHTML = appData.students.map(s => 
       `<option value="${s.nationalCode}">${s.fullname} - ${s.className || 'بدون کلاس'}</option>`
     ).join('');
-    if (currentVal) studentSelect.value = currentVal;
   }
-  
-  // پر کردن کلاس‌ها
   let classSelect = document.getElementById('consentTargetClass');
   if (classSelect) {
     let currentVal = classSelect.value;
@@ -1577,8 +1292,6 @@ function renderConsentTab() {
       appData.classes.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
     if (currentVal) classSelect.value = currentVal;
   }
-  
-  // نمایش فرم‌های رضایت‌نامه
   let el = document.getElementById('consentFormsList');
   if (!el) return;
   if (!appData.consentForms.length) {
@@ -1644,6 +1357,256 @@ window.viewSignature = function(responseId) {
   let m = createModal('امضای دیجیتال', '<div style="text-align:center;"><img src="' + r.signature + '" style="max-width:100%;border:1px solid var(--border);border-radius:8px;background:#fff;"><p style="margin-top:0.5rem;font-size:0.8rem;">امضاکننده: <strong>' + (r.parentName || '-') + '</strong> | تاریخ: ' + (r.respondedDate || '-') + '</p></div>', '500px');
   document.body.appendChild(m);
 };
+
+// ============================================================
+// ===== REPORTS - یکپارچه و کامل =====
+// ============================================================
+function renderReportsAll() {
+  updateSchoolStats();
+  updateSmartInsights();
+  updateAIInsights();
+  renderTeacherGradesTable();
+  renderTeacherHomeworksTable();
+  renderTeacherAttendanceTable();
+  renderReportsTable();
+  fillReportSelects();
+}
+
+function updateSchoolStats() {
+  let allG = appData.grades;
+  let avg = allG.length ? (allG.reduce((s, g) => s + g.score, 0) / allG.length).toFixed(1) : 0;
+  document.getElementById('schoolAvgGrade').textContent = avg;
+  let allR = appData.reports;
+  let present = allR.filter(r => r.type === 'present').length;
+  let total = allR.filter(r => ['present', 'absent', 'excused', 'late'].includes(r.type)).length;
+  document.getElementById('schoolAttendanceRate').textContent = total ? Math.round(present / total * 100) + '%' : '0%';
+  document.getElementById('totalGradesCount').textContent = allG.length;
+  document.getElementById('totalViolations').textContent = allR.filter(r => r.type === 'negative').length;
+}
+
+function renderStudentCard() {
+  let studentId = document.getElementById('cardStudentSelect')?.value;
+  let el = document.getElementById('studentCard');
+  if (!el) return;
+  if (!studentId) {
+    el.innerHTML = '<div style="text-align:center;padding:0.5rem;color:var(--text-secondary);">لطفاً یک دانش‌آموز را انتخاب کنید</div>';
+    return;
+  }
+  let s = appData.students.find(x => x.nationalCode === studentId);
+  if (!s) {
+    el.innerHTML = '<div style="text-align:center;padding:0.5rem;color:var(--text-secondary);">دانش‌آموزی یافت نشد</div>';
+    return;
+  }
+  let g = appData.grades.filter(x => x.studentId === studentId);
+  let r = appData.reports.filter(x => x.studentId === studentId);
+  let present = r.filter(x => x.type === 'present').length;
+  let absent = r.filter(x => x.type === 'absent').length;
+  let excused = r.filter(x => x.type === 'excused').length;
+  let late = r.filter(x => x.type === 'late').length;
+  let positive = r.filter(x => x.type === 'positive').length;
+  let negative = r.filter(x => x.type === 'negative').length;
+  let score = calcScore(studentId);
+  let avg = calcAvg(studentId);
+  el.innerHTML = `
+    <div style="text-align:center;border-bottom:1px solid var(--border);padding-bottom:0.3rem;margin-bottom:0.3rem;">
+      <div style="font-weight:700;font-size:1rem;">${s.fullname}</div>
+      <div style="font-size:0.7rem;color:var(--text-secondary);">${s.className || ''} | کد: ${s.nationalCode}</div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:0.1rem;text-align:center;font-size:0.55rem;margin-bottom:0.3rem;">
+      <div style="padding:0.1rem;background:#d1fae5;border-radius:4px;"><div style="font-weight:700;color:var(--success);">${present}</div>حضور</div>
+      <div style="padding:0.1rem;background:#fee2e2;border-radius:4px;"><div style="font-weight:700;color:var(--danger);">${absent}</div>غیبت</div>
+      <div style="padding:0.1rem;background:var(--primary-bg);border-radius:4px;"><div style="font-weight:700;color:var(--primary);">${excused}</div>موجه</div>
+      <div style="padding:0.1rem;background:#fef3c7;border-radius:4px;"><div style="font-weight:700;color:var(--warning);">${late}</div>تأخیر</div>
+      <div style="padding:0.1rem;background:var(--primary-bg);border-radius:4px;"><div style="font-weight:700;color:var(--primary);">${positive}</div>مثبت</div>
+      <div style="padding:0.1rem;background:#ede9fe;border-radius:4px;"><div style="font-weight:700;color:var(--secondary);">${negative}</div>تخلف</div>
+    </div>
+    <div style="text-align:center;padding:0.2rem;background:var(--bg);border-radius:6px;font-size:0.8rem;">
+      <span style="font-weight:700;">معدل:</span> <span style="font-weight:800;color:${avg >= 17 ? 'var(--success)' : avg >= 14 ? 'var(--primary)' : avg >= 10 ? 'var(--warning)' : 'var(--danger)'};">${avg}</span>
+      <span style="margin:0 0.3rem;">|</span>
+      <span style="font-weight:700;">انضباط:</span> <span style="font-weight:800;color:${score >= 15 ? 'var(--success)' : 'var(--danger)'};">${score}</span>
+    </div>
+    <div style="margin-top:0.3rem;font-size:0.7rem;">
+      <span style="font-weight:700;">نمرات:</span>
+      ${g.length ? g.map(x => '<span class="badge badge-info" style="margin-left:0.2rem;">' + x.courseName + ': ' + x.score + '</span>').join('') : '<span style="color:var(--text-secondary);">هیچ نمره‌ای ثبت نشده</span>'}
+    </div>
+    <button onclick="showStudentCard('${studentId}')" class="btn btn-primary" style="width:100%;margin-top:0.3rem;justify-content:center;font-size:0.7rem;padding:0.2rem 0.5rem;">
+      <i class="fas fa-file-alt"></i> مشاهده کارنامه کامل
+    </button>
+  `;
+}
+
+function fillReportSelects() {
+  let search = document.getElementById('searchStudentCard')?.value.toLowerCase() || '';
+  let filtered = appData.students.filter(s => s.fullname.toLowerCase().includes(search) || s.nationalCode.includes(search));
+  let sel = document.getElementById('cardStudentSelect');
+  if (sel) {
+    let cur = sel.value;
+    sel.innerHTML = '<option value="">انتخاب دانش‌آموز</option>' + 
+      filtered.map(s => `<option value="${s.nationalCode}">${s.fullname} - ${s.className || 'بدون کلاس'}</option>`).join('');
+    if (cur && appData.students.some(s => s.nationalCode === cur)) sel.value = cur;
+    if (sel.value) renderStudentCard();
+  }
+}
+
+function renderTeacherGradesTable() {
+  let search = document.getElementById('searchTeacherGrades')?.value.toLowerCase() || '';
+  let filterClass = document.getElementById('filterTeacherClass')?.value || '';
+  let filterTeacher = document.getElementById('filterTeacherName')?.value || '';
+  let filtered = appData.grades.filter(g => {
+    let s = appData.students.find(x => x.nationalCode === g.studentId);
+    let t = appData.teachers.find(x => x.id === g.teacherId);
+    let ms = !search || (t?.name?.toLowerCase().includes(search)) || (s?.fullname?.toLowerCase().includes(search)) || (g.courseName?.toLowerCase().includes(search));
+    let mc = !filterClass || (s && s.className === filterClass);
+    let mt = !filterTeacher || (t && t.id === filterTeacher);
+    return ms && mc && mt;
+  });
+  filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+  let tbody = document.getElementById('teacherGradesTable');
+  if (!tbody) return;
+  if (!filtered.length) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:1rem;color:var(--text-secondary);">هیچ نمره‌ای ثبت نشده است</td></tr>';
+    document.getElementById('teacherGradesCount').textContent = '0';
+    return;
+  }
+  tbody.innerHTML = filtered.map(g => {
+    let s = appData.students.find(x => x.nationalCode === g.studentId);
+    let t = appData.teachers.find(x => x.id === g.teacherId);
+    let typeText = { exam: 'امتحان', homework: 'تکلیف', activity: 'فعالیت', project: 'پروژه' }[g.type] || g.type;
+    let cls = g.score >= 17 ? 'grade-excellent' : g.score >= 14 ? 'grade-good' : g.score >= 10 ? 'grade-average' : 'grade-poor';
+    return '<tr><td>' + (t?.name || '-') + '</td><td>' + (s?.fullname || '-') + '</td><td>' + (s?.className || '-') + '</td><td style="font-weight:600;">' + g.courseName + '</td><td>' + typeText + '</td><td>' + (g.title || '-') + '</td><td><span class="' + cls + '">' + g.score + '</span></td><td style="color:var(--text-secondary);">' + g.date + '</td></tr>';
+  }).join('');
+  document.getElementById('teacherGradesCount').textContent = filtered.length;
+}
+
+function renderTeacherHomeworksTable() {
+  let search = document.getElementById('searchHomework')?.value.toLowerCase() || '';
+  let filtered = appData.homeworks.filter(h => {
+    let t = appData.teachers.find(x => x.id === h.teacherId);
+    return !search || h.title.toLowerCase().includes(search) || h.className.toLowerCase().includes(search) || (t?.name?.toLowerCase().includes(search));
+  });
+  filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+  let tbody = document.getElementById('teacherHomeworksTable');
+  if (!tbody) return;
+  if (!filtered.length) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:1rem;color:var(--text-secondary);">هیچ تکلیفی ثبت نشده است</td></tr>';
+    return;
+  }
+  tbody.innerHTML = filtered.map(h => {
+    let t = appData.teachers.find(x => x.id === h.teacherId);
+    return '<tr><td>' + (t?.name || '-') + '</td><td>' + h.className + '</td><td>' + h.courseName + '</td><td style="font-weight:600;">' + h.title + '</td><td style="max-width:120px;">' + (h.description || '-') + '</td><td>' + h.deadline + '</td><td style="color:var(--text-secondary);">' + h.date + '</td></tr>';
+  }).join('');
+}
+
+function renderTeacherAttendanceTable() {
+  let search = document.getElementById('searchTeacherAttendance')?.value.toLowerCase() || '';
+  let filterType = document.getElementById('filterAttendanceType')?.value || '';
+  let filtered = appData.reports.filter(r => {
+    let s = appData.students.find(x => x.nationalCode === r.studentId);
+    let ms = !search || (s?.fullname?.toLowerCase().includes(search)) || (s?.className?.toLowerCase().includes(search));
+    let mt = !filterType || r.type === filterType;
+    return ms && mt && ['present', 'absent', 'late', 'excused'].includes(r.type);
+  });
+  filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+  let tbody = document.getElementById('teacherAttendanceTable');
+  if (!tbody) return;
+  if (!filtered.length) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:1rem;color:var(--text-secondary);">هیچ گزارشی ثبت نشده است</td></tr>';
+    return;
+  }
+  let typeMap = { present: '✅ حاضر', absent: '❌ غایب', late: '⏰ تأخیر', excused: '📋 غیبت موجه' };
+  let colorMap = { present: 'color:var(--success);', absent: 'color:var(--danger);', late: 'color:var(--warning);', excused: 'color:var(--primary);' };
+  tbody.innerHTML = filtered.map(r => {
+    let s = appData.students.find(x => x.nationalCode === r.studentId);
+    return '<tr><td>' + (r.reporter || 'معلم/ناظم') + '</td><td>' + (s?.fullname || '-') + '</td><td>' + (s?.className || '-') + '</td><td style="font-weight:600;' + (colorMap[r.type] || '') + '">' + (typeMap[r.type] || r.type) + '</td><td>' + r.date + '</td><td style="max-width:120px;">' + (r.description || '-') + '</td></tr>';
+  }).join('');
+}
+
+function renderReportsTable() {
+  let search = document.getElementById('searchReport')?.value.toLowerCase() || '';
+  let filtered = appData.reports.filter(r => {
+    let s = appData.students.find(x => x.nationalCode === r.studentId);
+    return s?.fullname.toLowerCase().includes(search) || s?.className?.toLowerCase().includes(search);
+  });
+  filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+  let tbody = document.getElementById('allReportsTable');
+  if (!tbody) return;
+  if (!filtered.length) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:1rem;color:var(--text-secondary);">هیچ گزارشی یافت نشد</td></tr>';
+    return;
+  }
+  let typeMap = { present: '✅ حضور', absent: '❌ غیبت', excused: '📋 غیبت موجه', late: '⏰ تأخیر', positive: '🌟 رفتار مثبت', negative: '⚠️ تخلف' };
+  let colorMap = { present: 'color:var(--success);', absent: 'color:var(--danger);', excused: 'color:var(--primary);', late: 'color:var(--warning);', positive: 'color:var(--primary);', negative: 'color:var(--danger);' };
+  tbody.innerHTML = filtered.map(r => {
+    let s = appData.students.find(x => x.nationalCode === r.studentId);
+    return '<tr><td>' + (s?.fullname || r.studentId) + '</td><td>' + (s?.className || '-') + '</td><td style="font-weight:600;' + (colorMap[r.type] || '') + '">' + (typeMap[r.type] || r.type) + '</td><td>' + r.date + '</td><td>' + (r.description || '-') + '</td><td>' + (r.reporter || 'ناظم') + '</td></tr>';
+  }).join('');
+}
+
+// ============================================================
+// AI INSIGHTS
+// ============================================================
+function updateAIInsights() {
+  let allG = appData.grades;
+  let avg = allG.length ? (allG.reduce((s, g) => s + g.score, 0) / allG.length).toFixed(1) : 0;
+  let totalS = appData.students.length;
+  let totalT = appData.teachers.length;
+  let neg = appData.reports.filter(r => r.type === 'negative').length;
+  let absent = appData.reports.filter(r => r.type === 'absent' || r.type === 'excused').length;
+  let summary = '📌 وضعیت کلی: مدرسه با ' + totalS + ' دانش‌آموز و ' + totalT + ' معلم فعال است. میانگین نمرات ' + avg + ' از 20 می‌باشد. ';
+  if (avg >= 17) summary += 'وضعیت تحصیلی عالی است! 🎉';
+  else if (avg >= 14) summary += 'وضعیت تحصیلی خوب است. قابل قبول ✅';
+  else if (avg >= 10) summary += 'وضعیت تحصیلی متوسط است. نیاز به بهبود دارد ⚠️';
+  else summary += 'وضعیت تحصیلی ضعیف است. نیاز به مداخله فوری ❗';
+  if (neg > 10) summary += ' تعداد تخلفات (' + neg + ') نسبتاً بالاست.';
+  document.getElementById('aiSummary').textContent = summary;
+  let sugg = [];
+  if (avg < 14) sugg.push('برگزاری کلاس‌های جبرانی برای دروس ضعیف');
+  if (neg > totalS * 0.5) sugg.push('برگزاری جلسات انضباطی و فرهنگی');
+  if (absent > totalS * 2) sugg.push('پیگیری علت غیبت‌های مکرر دانش‌آموزان');
+  if (appData.classes.length < 3) sugg.push('توسعه کلاس‌های جدید برای تنوع آموزشی');
+  if (!sugg.length) sugg.push('وضعیت خوب است! همین مسیر را ادامه دهید.');
+  document.getElementById('aiSuggestions').innerHTML = sugg.map(s => '• ' + s).join('<br>');
+  let trends = {};
+  appData.grades.forEach(g => { if (!trends[g.courseName]) trends[g.courseName] = []; trends[g.courseName].push(g.score); });
+  let th = '';
+  for (let c in trends) {
+    let s = trends[c];
+    if (s.length >= 3) { let r = s.slice(-3); let up = r[2] > r[0]; th += '• ' + c + ': ' + (up ? '📈 صعودی' : '📉 نزولی') + ' (' + r[0] + ' → ' + r[2] + ')<br>'; }
+  }
+  document.getElementById('aiTrends').innerHTML = th || 'داده کافی برای تحلیل روند وجود ندارد.';
+  let alerts = [];
+  let absentMap = {};
+  appData.reports.filter(r => r.type === 'absent').forEach(r => { absentMap[r.studentId] = (absentMap[r.studentId] || 0) + 1; });
+  let high = Object.values(absentMap).filter(v => v >= 5).length;
+  if (high) alerts.push('⚠️ ' + high + ' دانش‌آموز با غیبت بیش از ۵ جلسه');
+  if (avg < 12) alerts.push('⚠️ میانگین نمرات پایین‌تر از حد قابل قبول');
+  if (neg > 20) alerts.push('⚠️ افزایش چشمگیر تخلفات انضباطی');
+  let debtors = appData.students.filter(s => getTuitionStatus(s.nationalCode) === 'معوقه').length;
+  if (debtors > 0) alerts.push('⚠️ ' + debtors + ' دانش‌آموز دارای شهریه معوقه هستند');
+  if (!alerts.length) alerts.push('✅ هیچ هشدار جدی وجود ندارد');
+  document.getElementById('aiAlerts').innerHTML = alerts.map(a => '• ' + a).join('<br>');
+}
+
+function updateSmartInsights() {
+  let tAvgs = {};
+  appData.teachers.forEach(t => { tAvgs[t.id] = { name: t.name, total: 0, count: 0 }; });
+  appData.grades.forEach(g => { if (tAvgs[g.teacherId]) { tAvgs[g.teacherId].total += g.score; tAvgs[g.teacherId].count++; } });
+  let best = null, bestAvg = -1;
+  for (let id in tAvgs) { let avg = tAvgs[id].count ? tAvgs[id].total / tAvgs[id].count : 0; if (avg > bestAvg) { bestAvg = avg; best = tAvgs[id].name; } }
+  document.getElementById('bestTeacherOfMonth').textContent = best ? best + ' (میانگین ' + bestAvg.toFixed(1) + ')' : '---';
+  let risk = appData.students.filter(s => calcScore(s.nationalCode) < 12).length;
+  document.getElementById('studentsAtRisk').textContent = risk;
+  let absentMap = {};
+  appData.reports.filter(r => r.type === 'absent').forEach(r => { absentMap[r.studentId] = (absentMap[r.studentId] || 0) + 1; });
+  let maxA = 0, maxName = '---';
+  for (let id in absentMap) { if (absentMap[id] > maxA && absentMap[id] >= 3) { maxA = absentMap[id]; let s = appData.students.find(x => x.nationalCode === id); maxName = s ? s.fullname + ' (' + maxA + ' غیبت)' : '---'; } }
+  document.getElementById('mostAbsentStudent').textContent = maxA >= 3 ? maxName : 'غیبت چشمگیر ندارد';
+  let courseSum = {}, courseCount = {};
+  appData.grades.forEach(g => { if (!courseSum[g.courseName]) { courseSum[g.courseName] = 0; courseCount[g.courseName] = 0; } courseSum[g.courseName] += g.score; courseCount[g.courseName]++; });
+  let topC = null, topA = -1;
+  for (let c in courseSum) { let avg = courseSum[c] / courseCount[c]; if (avg > topA) { topA = avg; topC = c; } }
+  document.getElementById('topSubjectAvg').textContent = topC ? topC + ' (' + topA.toFixed(1) + ')' : '---';
+}
 
 // ============================================================
 // HIERARCHY
@@ -1732,6 +1695,13 @@ function fillSelects() {
   if (teacherSel) teacherSel.innerHTML = '<option value="">انتخاب معلم</option>' + appData.teachers.map(t => '<option value="' + t.id + '">' + t.name + '</option>').join('');
   let filterTeacher = document.getElementById('filterTeacherName');
   if (filterTeacher) filterTeacher.innerHTML = '<option value="">همه معلمان</option>' + appData.teachers.map(t => '<option value="' + t.id + '">' + t.name + '</option>').join('');
+  let consentTarget = document.getElementById('consentTargetClass');
+  if (consentTarget) {
+    let cur = consentTarget.value;
+    consentTarget.innerHTML = '<option value="">انتخاب کلاس</option>' + appData.classes.map(c => '<option value="' + c.name + '">' + c.name + '</option>').join('');
+    if (cur) consentTarget.value = cur;
+  }
+  fillReportSelects();
 }
 
 function updateFilterClassSelect() {
@@ -1763,16 +1733,7 @@ document.querySelectorAll('.sidebar-link').forEach(btn => {
       reports: ['گزارشات و کارنامه', 'نمرات، حضور و تحلیل هوشمند']
     };
     if (titles[tab]) { document.getElementById('pageTitle').textContent = titles[tab][0]; document.getElementById('pageSub').textContent = titles[tab][1]; }
-    if (tab === 'reports') {
-      renderTeacherGradesTable();
-      renderTeacherHomeworksTable();
-      renderTeacherAttendanceTable();
-      renderReportsTable();
-      updateSchoolStats();
-      updateSmartInsights();
-      updateAIInsights();
-      fillReportSelects();
-    }
+    if (tab === 'reports') renderReportsAll();
     if (tab === 'accounting') renderAccountingTab();
     if (tab === 'tuition') renderTuitionTab();
     if (tab === 'consent') renderConsentTab();
@@ -1929,9 +1890,7 @@ document.getElementById('createConsentBtn')?.addEventListener('click', function(
   let targetClass = document.getElementById('consentTargetClass').value;
   let targetStudents = document.getElementById('consentTargetStudents');
   let selectedStudents = targetStudents ? Array.from(targetStudents.selectedOptions).map(opt => opt.value) : [];
-  
   if (!title || !text) { showToast('❌ عنوان و متن الزامی است', true); return; }
-  
   let targets = [];
   if (targetType === 'all') {
     targets = appData.students;
@@ -1942,30 +1901,11 @@ document.getElementById('createConsentBtn')?.addEventListener('click', function(
     if (!selectedStudents.length) { showToast('❌ حداقل یک دانش‌آموز را انتخاب کنید', true); return; }
     targets = appData.students.filter(s => selectedStudents.includes(s.nationalCode));
   }
-  
   if (!targets.length) { showToast('❌ هیچ دانش‌آموزی برای این مخاطب یافت نشد', true); return; }
-  
-  let form = { 
-    id: uid('cf'), 
-    title: title, 
-    text: text, 
-    targetType: targetType, 
-    targetClass: targetClass,
-    targetStudents: selectedStudents,
-    deadline: deadline, 
-    createdDate: todayStr() 
-  };
+  let form = { id: uid('cf'), title: title, text: text, targetType: targetType, targetClass: targetClass, targetStudents: selectedStudents, deadline: deadline, createdDate: todayStr() };
   appData.consentForms.push(form);
   targets.forEach(s => {
-    appData.consentResponses.push({ 
-      id: uid('cr'), 
-      formId: form.id, 
-      studentId: s.nationalCode, 
-      status: 'pending', 
-      parentName: '', 
-      signature: null, 
-      respondedDate: null 
-    });
+    appData.consentResponses.push({ id: uid('cr'), formId: form.id, studentId: s.nationalCode, status: 'pending', parentName: '', signature: null, respondedDate: null });
   });
   saveData(); renderAll();
   document.getElementById('consentTitle').value = '';
@@ -2098,7 +2038,7 @@ document.getElementById('selectClassForTeacher')?.addEventListener('change', fun
 // ============================================================
 loadData();
 document.querySelector('.sidebar-link.active')?.click();
-console.log('✅ ناظم‌یار نسخه کامل با گزارشات حرفه‌ای بارگذاری شد!');
+console.log('✅ ناظم‌یار نسخه یکپارچه با گزارشات کامل بارگذاری شد!');
 </script>
 </body>
 </html>
