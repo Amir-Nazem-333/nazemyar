@@ -389,7 +389,9 @@ tbody tr:hover td { background: var(--bg); }
           <select id="cardStudentSelect" style="margin-bottom:0.5rem;width:100%;">
             <option value="">انتخاب دانش‌آموز</option>
           </select>
-          <div id="studentCard" style="padding:0.8rem;border-radius:10px;background:var(--bg);min-height:80px;"></div>
+          <div id="studentCard" style="padding:0.8rem;border-radius:10px;background:var(--bg);min-height:80px;">
+            <div style="text-align:center;padding:0.5rem;color:var(--text-secondary);">لطفاً یک دانش‌آموز را انتخاب کنید</div>
+          </div>
         </div>
         <div class="card">
           <h3 class="card-title"><i class="fas fa-chart-pie" style="color:var(--secondary);"></i> آمار کلی مدرسه</h3>
@@ -559,10 +561,50 @@ function calcAvg(studentId) {
   return Math.round((g.reduce((a, b) => a + b.score, 0) / g.length) * 10) / 10;
 }
 
-function saveData() { localStorage.setItem('nazemyar_v19', JSON.stringify(appData)); }
+function saveData() { localStorage.setItem('nazemyar_v20', JSON.stringify(appData)); }
 function loadData() {
-  let s = localStorage.getItem('nazemyar_v19');
-  if (s) { let p = JSON.parse(s); Object.assign(appData, p); }
+  let s = localStorage.getItem('nazemyar_v20');
+  if (s) {
+    try { let p = JSON.parse(s); Object.assign(appData, p); }
+    catch(e) { console.warn('Error parsing data, using default'); }
+  }
+  // اگر داده‌ای نبود، داده‌های نمونه ایجاد کن
+  if (!appData.classes.length && !appData.students.length) {
+    // کلاس‌های نمونه
+    appData.classes.push(
+      { id: 'c1', name: 'دهم ریاضی', courses: [{ courseName: 'ریاضی', teacherId: null }, { courseName: 'فیزیک', teacherId: null }] },
+      { id: 'c2', name: 'یازدهم تجربی', courses: [{ courseName: 'زیست', teacherId: null }, { courseName: 'شیمی', teacherId: null }] }
+    );
+    // معلمان نمونه
+    appData.teachers.push(
+      { id: 't1', name: 'احمد رضایی', code: 'T001', phone: '09121112222', password: 'teacher123' },
+      { id: 't2', name: 'مریم حسینی', code: 'T002', phone: '09123334444', password: 'teacher123' }
+    );
+    // ناظم نمونه
+    appData.supervisors.push({ id: 's1', name: 'علی کریمی', code: 'S001', phone: '09125556666', password: 'nazem123' });
+    // دانش‌آموزان نمونه
+    appData.students.push(
+      { fullname: 'محمد محمدی', nationalCode: '1234567890', className: 'دهم ریاضی', birthYear: '1385', phone: '09121111111', parentPhone: '09122222222', password: '123456' },
+      { fullname: 'سارا احمدی', nationalCode: '0987654321', className: 'یازدهم تجربی', birthYear: '1386', phone: '09123333333', parentPhone: '09124444444', password: '123456' }
+    );
+    // نمرات نمونه
+    appData.grades.push(
+      { id: 'g1', studentId: '1234567890', teacherId: 't1', courseName: 'ریاضی', score: 18.5, type: 'exam', date: '۱۴۰۴/۰۳/۱۰' },
+      { id: 'g2', studentId: '1234567890', teacherId: 't1', courseName: 'فیزیک', score: 16, type: 'exam', date: '۱۴۰۴/۰۳/۱۵' },
+      { id: 'g3', studentId: '0987654321', teacherId: 't2', courseName: 'زیست', score: 19, type: 'exam', date: '۱۴۰۴/۰۳/۱۲' }
+    );
+    // گزارشات نمونه
+    appData.reports.push(
+      { id: 'r1', studentId: '1234567890', type: 'present', date: '۱۴۰۴/۰۳/۱۰', reporter: 'علی کریمی' },
+      { id: 'r2', studentId: '0987654321', type: 'absent', date: '۱۴۰۴/۰۳/۱۲', reporter: 'علی کریمی', description: 'غیبت موجه' }
+    );
+    // شهریه نمونه
+    appData.tuitions.push(
+      { studentId: '1234567890', totalTuition: 5000000, discount: 500000, payments: [{ id: 'p1', amount: 2000000, date: '۱۴۰۴/۰۲/۱۵', method: 'نقدی' }] },
+      { studentId: '0987654321', totalTuition: 5500000, discount: 0, payments: [] }
+    );
+    saveData();
+  }
   renderAll();
 }
 
@@ -663,7 +705,14 @@ function renderAll() {
   fillSelects();
   renderDashboardCharts();
   updateFilterClassSelect();
-  fillReportSelects();
+  fillReportSelects(); // پر کردن لیست دانش‌آموزان در کارنامه
+  // بعد از پر شدن لیست، کارنامه را نمایش بده اگر دانش‌آموزی انتخاب شده باشد
+  setTimeout(function() {
+    let sel = document.getElementById('cardStudentSelect');
+    if (sel && sel.value) {
+      renderStudentCard();
+    }
+  }, 100);
 }
 
 // ===== DASHBOARD =====
@@ -1369,7 +1418,15 @@ function renderReportsAll() {
   renderTeacherHomeworksTable();
   renderTeacherAttendanceTable();
   renderReportsTable();
+  // پر کردن لیست دانش‌آموزان
   fillReportSelects();
+  // نمایش کارنامه اگر دانش‌آموزی انتخاب شده باشد
+  setTimeout(function() {
+    let sel = document.getElementById('cardStudentSelect');
+    if (sel && sel.value) {
+      renderStudentCard();
+    }
+  }, 50);
 }
 
 function updateSchoolStats() {
@@ -1443,8 +1500,15 @@ function fillReportSelects() {
     let cur = sel.value;
     sel.innerHTML = '<option value="">انتخاب دانش‌آموز</option>' + 
       filtered.map(s => `<option value="${s.nationalCode}">${s.fullname} - ${s.className || 'بدون کلاس'}</option>`).join('');
-    if (cur && appData.students.some(s => s.nationalCode === cur)) sel.value = cur;
-    if (sel.value) renderStudentCard();
+    if (cur && appData.students.some(s => s.nationalCode === cur)) {
+      sel.value = cur;
+      // اگر دانش‌آموز انتخاب شده، کارنامه را نمایش بده
+      renderStudentCard();
+    } else if (filtered.length === 1) {
+      // اگر فقط یک دانش‌آموز در نتیجه جستجو هست، آن را انتخاب کن
+      sel.value = filtered[0].nationalCode;
+      renderStudentCard();
+    }
   }
 }
 
@@ -1701,6 +1765,7 @@ function fillSelects() {
     consentTarget.innerHTML = '<option value="">انتخاب کلاس</option>' + appData.classes.map(c => '<option value="' + c.name + '">' + c.name + '</option>').join('');
     if (cur) consentTarget.value = cur;
   }
+  // پر کردن لیست دانش‌آموزان در کارنامه
   fillReportSelects();
 }
 
