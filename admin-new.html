@@ -99,8 +99,17 @@ img{max-width:100%;}
   content:"";position:absolute;inset:0 0 auto 0;height:6px;
   background:linear-gradient(90deg,var(--navy-800),var(--gold) 50%,var(--navy-800));
 }
-.hero-title{font-size:clamp(22px,3.4vw,30px);font-weight:800;color:var(--navy-950);line-height:1.55;margin:0 0 10px;}
-.hero-sub{color:var(--ink-soft);font-size:15px;line-height:2;max-width:60ch;margin:0 0 30px;}
+.hero-title{font-size:clamp(19px,5vw,30px);font-weight:800;color:var(--navy-950);line-height:1.6;margin:0 0 10px;}
+.hero-sub{color:var(--ink-soft);font-size:clamp(13px,3.6vw,15px);line-height:2;max-width:60ch;margin:0 0 26px;}
+@media (max-width:560px){
+  .landing{padding:22px 12px 40px;}
+  .hero-card{padding:26px 18px 22px;border-radius:20px;}
+  .brand-row{margin-bottom:22px;}
+  .seal{width:44px;height:44px;}
+  .seal svg{width:22px;height:22px;}
+  .brand-text b{font-size:16.5px;}
+  .foot-note{font-size:11px;padding:0 4px;}
+}
 .choice-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
 @media (max-width:640px){.choice-grid{grid-template-columns:1fr;}}
 .choice-card{
@@ -123,7 +132,7 @@ img{max-width:100%;}
 /* ---------- shared layout ---------- */
 .app-shell{min-height:100vh;display:flex;}
 .sidebar{
-  width:238px;flex:none;background:var(--navy-950);color:#DCE3F0;
+  width:238px;max-width:82vw;flex:none;background:var(--navy-950);color:#DCE3F0;
   display:flex;flex-direction:column;padding:20px 16px;
   position:sticky;top:0;height:100vh;
 }
@@ -133,6 +142,7 @@ img{max-width:100%;}
 .nav-item{
   display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:10px;
   color:#B7C0D4;font-size:13.6px;font-weight:600;cursor:pointer;margin-bottom:3px;border:1px solid transparent;
+  transition:background .15s, color .15s, border-color .15s;
 }
 .nav-item svg{width:18px;height:18px;flex:none;}
 .nav-item:hover{background:rgba(255,255,255,.05);color:#fff;}
@@ -161,6 +171,20 @@ img{max-width:100%;}
   .overlay-mask{position:fixed;inset:0;background:rgba(10,14,24,.4);z-index:55;}
 }
 .page{padding:22px 26px 60px;max-width:1180px;}
+@media (max-width:680px){
+  .page{padding:16px 14px 50px;}
+  .topbar{padding:12px 14px;}
+  .topbar h1{font-size:15px;}
+  .topbar .sub{display:none;}
+  .card-pad{padding:16px;}
+  .section-title{font-size:14px;}
+  .stat-grid{gap:10px;}
+  .stat-card{padding:13px 14px;}
+  .stat-card .val{font-size:21px;}
+}
+@media (max-width:420px){
+  .stat-grid{grid-template-columns:1fr 1fr;gap:8px;}
+}
 
 .btn{
   display:inline-flex;align-items:center;justify-content:center;gap:7px;
@@ -230,10 +254,35 @@ tbody td{padding:12px 14px;border-bottom:1px solid #EEF1F6;vertical-align:middle
 tbody tr:last-child td{border-bottom:none;}
 tbody tr{cursor:pointer;}
 tbody tr:hover{background:#FAFBFD;}
+@media (max-width:680px){
+  .table-wrap{border:none;background:transparent;border-radius:0;overflow:visible;}
+  table{min-width:0;}
+  thead{display:none;}
+  table,tbody,tr,td{display:block;width:100%;}
+  tbody tr{background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow-1);margin-bottom:10px;padding:4px 2px;}
+  tbody tr:last-child{margin-bottom:0;}
+  tbody td{border-bottom:1px dashed #EEF1F6;padding:9px 14px;display:flex;align-items:center;justify-content:space-between;gap:14px;text-align:left;font-size:12.8px;}
+  tbody td:last-child{border-bottom:none;}
+  tbody td:empty{display:none;}
+  tbody td::before{content:attr(data-label);font-size:11px;color:var(--ink-soft);font-weight:700;flex:none;text-align:right;}
+  tbody td[data-label=""]::before{display:none;}
+  tbody td[data-label=""]{justify-content:center;}
+  .name-strong{font-size:13.6px;}
+}
 .name-strong{font-weight:700;color:var(--navy-950);}
 .muted{color:var(--ink-soft);}
+.wizard-actions{gap:10px;}
+.wizard-actions .btn{flex:1;}
+@media (max-width:520px){
+  .wizard-actions{flex-direction:column-reverse;}
+  .wizard-actions .btn{width:100%;}
+}
 .filters-row{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px;align-items:center;}
 .filters-row select,.filters-row input{width:auto;min-width:140px;}
+@media (max-width:560px){
+  .filters-row{flex-direction:column;align-items:stretch;}
+  .filters-row select,.filters-row input,.search-box{width:100%;min-width:0;}
+}
 .search-box{position:relative;flex:1;min-width:180px;}
 .search-box svg{position:absolute;top:50%;transform:translateY(-50%);inset-inline-start:10px;width:15px;height:15px;color:#9AA4B7;}
 .search-box input{padding-inline-start:32px;}
@@ -287,8 +336,12 @@ tbody tr:hover{background:#FAFBFD;}
 .kyc-frame .cam-status{position:absolute;bottom:10px;right:10px;left:10px;background:rgba(14,22,38,.55);color:#fff;font-size:11.5px;padding:6px 10px;border-radius:8px;text-align:center;}
 .phrase-card{width:100%;max-width:420px;background:var(--navy-950);color:#fff;border-radius:14px;padding:16px 18px;text-align:center;}
 .phrase-card .lbl{font-size:11px;color:#93A0BE;margin-bottom:8px;}
-.phrase-card .txt{font-size:15px;line-height:2;font-weight:600;}
+.phrase-card .txt{font-size:clamp(13px,3.8vw,15px);line-height:1.95;font-weight:600;}
 .phrase-card .code{margin-top:10px;font-size:22px;font-weight:800;letter-spacing:2px;color:var(--gold);}
+@media (max-width:420px){
+  .kyc-frame{max-width:100%;}
+  .phrase-card{padding:13px 14px;}
+}
 .shots-row{display:flex;gap:8px;}
 .shot-thumb{width:64px;height:48px;border-radius:8px;overflow:hidden;border:2px solid var(--line);}
 .shot-thumb img{width:100%;height:100%;object-fit:cover;transform:scaleX(-1);}
@@ -305,8 +358,14 @@ tbody tr:hover{background:#FAFBFD;}
 .modal-box{background:#fff;border-radius:18px;max-width:560px;width:100%;max-height:88vh;overflow-y:auto;box-shadow:var(--shadow-2);}
 .modal-head{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--line);position:sticky;top:0;background:#fff;z-index:2;}
 .modal-head h3{margin:0;font-size:15.5px;font-weight:800;color:var(--navy-950);}
-.modal-close{width:30px;height:30px;border-radius:9px;border:1px solid var(--line);background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--ink-soft);}
+.modal-close{width:30px;height:30px;border-radius:9px;border:1px solid var(--line);background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--ink-soft);flex:none;}
 .modal-body{padding:20px;}
+@media (max-width:480px){
+  .modal-mask{padding:0;align-items:flex-end;}
+  .modal-box{max-width:100%;border-radius:18px 18px 0 0;max-height:92vh;}
+  .modal-body{padding:16px;}
+  .drawer{width:100%;}
+}
 .drawer-mask{position:fixed;inset:0;background:rgba(10,14,24,.4);z-index:100;}
 .drawer{position:fixed;top:0;bottom:0;inset-inline-end:0;width:min(480px,100%);background:#fff;z-index:101;box-shadow:var(--shadow-2);overflow-y:auto;animation:slideIn .22s ease;}
 @keyframes slideIn{from{transform:translateX(105%);}to{transform:none;}}
@@ -326,7 +385,8 @@ tbody tr:hover{background:#FAFBFD;}
 .receipt{border:2px solid var(--navy-900);border-radius:16px;padding:24px;position:relative;background:#fff;}
 .receipt .rtitle{text-align:center;font-weight:800;font-size:16px;color:var(--navy-950);margin-bottom:2px;}
 .receipt .rsub{text-align:center;font-size:11.5px;color:var(--ink-soft);margin-bottom:16px;}
-.receipt .rcode{text-align:center;font-size:22px;letter-spacing:3px;font-weight:800;color:var(--gold);margin:10px 0 16px;}
+.receipt .rcode{text-align:center;font-size:clamp(17px,5vw,22px);letter-spacing:2px;font-weight:800;color:var(--gold);margin:10px 0 16px;}
+@media (max-width:420px){ .receipt{padding:16px;} }
 .barcode{display:flex;gap:2px;justify-content:center;align-items:flex-end;height:34px;margin-bottom:16px;}
 .barcode span{width:3px;background:var(--navy-950);display:block;}
 
@@ -343,7 +403,8 @@ tbody tr:hover{background:#FAFBFD;}
 
 .login-card{max-width:420px;margin:0 auto;}
 .pin-boxes{display:flex;gap:8px;justify-content:center;direction:ltr;}
-.pin-boxes input{width:44px;height:52px;text-align:center;font-size:20px;font-weight:800;}
+.pin-boxes input{width:44px;height:52px;text-align:center;font-size:20px;font-weight:800;padding:0;}
+@media (max-width:360px){ .pin-boxes input{width:38px;height:46px;font-size:17px;} }
 .parent-pick{border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;}
 .parent-pick:hover{border-color:var(--navy-700);}
 .parent-pick.sel{border-color:var(--navy-900);background:var(--paper-2);}
@@ -747,7 +808,7 @@ function renderParentDashboard(target,parent){
     <div class="table-wrap"><table><thead><tr><th>نوع درخواست</th><th>دانش‌آموز</th><th>تاریخ</th><th>وضعیت</th></tr></thead><tbody>
     ${myReqs.slice(0,5).map(r=>{
       const st=DB.students.find(s=>s.id===r.studentId);
-      return `<tr data-id="${r.id}"><td>${escapeHtml(typeById(r.typeId).title)}</td><td>${escapeHtml(st?st.fullName:'-')}</td><td class="muted">${jalaliStr(new Date(r.createdAt))}</td><td>${statusBadge(r.status)}</td></tr>`;
+      return `<tr data-id="${r.id}"><td data-label="نوع درخواست">${escapeHtml(typeById(r.typeId).title)}</td><td data-label="دانش‌آموز">${escapeHtml(st?st.fullName:'-')}</td><td class="muted" data-label="تاریخ">${jalaliStr(new Date(r.createdAt))}</td><td data-label="وضعیت">${statusBadge(r.status)}</td></tr>`;
     }).join('')}
     </tbody></table></div>`}
   </div>`;
@@ -899,7 +960,7 @@ function stepDetails(body,w){
     <h3 class="section-title">${escapeHtml(type.title)}</h3>
     <p class="section-desc">اطلاعات لازم برای این درخواست را تکمیل کنید.</p>
     ${formHtml}
-    <div style="display:flex;justify-content:space-between;margin-top:10px">
+    <div class="wizard-actions" style="display:flex;justify-content:space-between;margin-top:10px">
       <button class="btn btn-outline" id="wBack">بازگشت</button>
       <button class="btn btn-primary" id="wNext">ادامه</button>
     </div>`;
@@ -977,7 +1038,7 @@ function stepLegal(body,w){
       <input type="checkbox" id="agreeChk">
       <label for="agreeChk">تایید می‌کنم که متن بالا را مطالعه کرده‌ام و مسئولیت صحت اطلاعات وارد‌شده را می‌پذیرم.</label>
     </div>
-    <div style="display:flex;justify-content:space-between;margin-top:16px">
+    <div class="wizard-actions" style="display:flex;justify-content:space-between;margin-top:16px">
       <button class="btn btn-outline" id="wBack">بازگشت</button>
       <button class="btn btn-primary" id="wNext" ${type.requiresCamera?'':''}>ادامه به ${type.requiresCamera?'احراز هویت':'امضا'}</button>
     </div>`;
@@ -1002,7 +1063,7 @@ function stepCamera(body,w){
       <div id="shotsArea" class="shots-row"></div>
       <div id="camActions" style="display:flex;gap:10px"></div>
     </div>
-    <div style="display:flex;justify-content:space-between;margin-top:18px">
+    <div class="wizard-actions" style="display:flex;justify-content:space-between;margin-top:18px">
       <button class="btn btn-outline" id="wBack">بازگشت</button>
       <button class="btn btn-primary" id="wNext" disabled>ادامه به امضا</button>
     </div>`;
@@ -1083,7 +1144,7 @@ function stepSignature(body,w){
     <p class="section-desc">لطفاً با انگشت یا ماوس، امضای خود را در کادر زیر ثبت کنید.</p>
     <div class="sig-wrap"><canvas id="sigCanvas"></canvas><div class="sig-baseline"></div><div class="sig-hint" id="sigHint">امضا کنید</div></div>
     <div style="display:flex;gap:10px;margin-top:10px"><button class="btn btn-outline btn-sm" id="sigClear">پاک کردن</button></div>
-    <div style="display:flex;justify-content:space-between;margin-top:18px">
+    <div class="wizard-actions" style="display:flex;justify-content:space-between;margin-top:18px">
       <button class="btn btn-outline" id="wBack">بازگشت</button>
       <button class="btn btn-primary" id="wNext">مرور و ثبت نهایی</button>
     </div>`;
@@ -1125,7 +1186,7 @@ function stepReview(body,w){
         <img src="${w.signatureData}" style="border:1px solid var(--line);border-radius:10px;width:100%;max-width:260px;background:#fff">
       </div>
     </div>
-    <div style="display:flex;justify-content:space-between;margin-top:20px">
+    <div class="wizard-actions" style="display:flex;justify-content:space-between;margin-top:20px">
       <button class="btn btn-outline" id="wBack">بازگشت</button>
       <button class="btn btn-gold" id="wSubmit">ثبت و ارسال رضایت‌نامه</button>
     </div>`;
@@ -1189,7 +1250,7 @@ function renderParentHistory(target,parent){
     `<div class="table-wrap"><table><thead><tr><th>کد رهگیری</th><th>نوع</th><th>دانش‌آموز</th><th>تاریخ</th><th>وضعیت</th></tr></thead><tbody>
       ${myReqs.map(r=>{
         const st=DB.students.find(s=>s.id===r.studentId);
-        return `<tr data-id="${r.id}"><td class="name-strong">${faNum(r.trackingCode)}</td><td>${escapeHtml(typeById(r.typeId).title)}</td><td>${escapeHtml(st?st.fullName:'-')}</td><td class="muted">${jalaliStr(new Date(r.createdAt))}</td><td>${statusBadge(r.status)}</td></tr>`;
+        return `<tr data-id="${r.id}"><td class="name-strong" data-label="کد رهگیری">${faNum(r.trackingCode)}</td><td data-label="نوع">${escapeHtml(typeById(r.typeId).title)}</td><td data-label="دانش‌آموز">${escapeHtml(st?st.fullName:'-')}</td><td class="muted" data-label="تاریخ">${jalaliStr(new Date(r.createdAt))}</td><td data-label="وضعیت">${statusBadge(r.status)}</td></tr>`;
       }).join('')}
     </tbody></table></div>`}
   </div>`;
@@ -1242,7 +1303,7 @@ function renderSchoolDashboard(target){
     <div class="table-wrap"><table><thead><tr><th>نوع</th><th>دانش‌آموز</th><th>والد</th><th>تاریخ</th><th></th></tr></thead><tbody>
     ${reqs.filter(r=>r.status==='pending').slice(0,6).map(r=>{
       const st=DB.students.find(s=>s.id===r.studentId); const pr=DB.parents.find(p=>p.id===r.parentId);
-      return `<tr data-id="${r.id}"><td>${escapeHtml(typeById(r.typeId).title)}</td><td>${escapeHtml(st?st.fullName:'-')}</td><td>${escapeHtml(pr?pr.fullName:'-')}</td><td class="muted">${jalaliStr(new Date(r.createdAt))}</td><td>${statusBadge(r.status)}</td></tr>`;
+      return `<tr data-id="${r.id}"><td data-label="نوع">${escapeHtml(typeById(r.typeId).title)}</td><td data-label="دانش‌آموز">${escapeHtml(st?st.fullName:'-')}</td><td data-label="والد">${escapeHtml(pr?pr.fullName:'-')}</td><td class="muted" data-label="تاریخ">${jalaliStr(new Date(r.createdAt))}</td><td data-label="وضعیت">${statusBadge(r.status)}</td></tr>`;
     }).join('')}</tbody></table></div>`}
   </div>`;
   const sa=document.getElementById('seeAll'); if(sa) sa.onclick=()=>setRoute('school.requests');
@@ -1281,7 +1342,7 @@ function renderSchoolRequests(target){
     `<div class="table-wrap"><table><thead><tr><th>کد رهگیری</th><th>نوع</th><th>دانش‌آموز</th><th>والد</th><th>تاریخ</th><th>وضعیت</th></tr></thead><tbody>
     ${list.map(r=>{
       const st=DB.students.find(s=>s.id===r.studentId); const pr=DB.parents.find(p=>p.id===r.parentId);
-      return `<tr data-id="${r.id}"><td class="name-strong">${faNum(r.trackingCode)}</td><td>${escapeHtml(typeById(r.typeId).title)}</td><td>${escapeHtml(st?st.fullName:'-')}</td><td>${escapeHtml(pr?pr.fullName:'-')}</td><td class="muted">${jalaliStr(new Date(r.createdAt))}</td><td>${statusBadge(r.status)}</td></tr>`;
+      return `<tr data-id="${r.id}"><td class="name-strong" data-label="کد رهگیری">${faNum(r.trackingCode)}</td><td data-label="نوع">${escapeHtml(typeById(r.typeId).title)}</td><td data-label="دانش‌آموز">${escapeHtml(st?st.fullName:'-')}</td><td data-label="والد">${escapeHtml(pr?pr.fullName:'-')}</td><td class="muted" data-label="تاریخ">${jalaliStr(new Date(r.createdAt))}</td><td data-label="وضعیت">${statusBadge(r.status)}</td></tr>`;
     }).join('')}</tbody></table></div>`}
   </div>`;
   document.getElementById('fq').oninput=e=>{ f.q=e.target.value; renderSchoolRequests(target); };
@@ -1371,7 +1432,7 @@ function renderStudentsTab(body){
       <button class="btn btn-gold btn-sm" id="addStudent">${ICO.plus} افزودن دانش‌آموز</button>
     </div>
     <div class="table-wrap"><table><thead><tr><th>نام</th><th>کد ملی</th><th>پایه</th><th>کلاس</th><th>والدین</th><th></th></tr></thead><tbody>
-    ${DB.students.map(s=>`<tr><td class="name-strong">${escapeHtml(s.fullName)}</td><td>${faNum(s.nationalCode)}</td><td>${escapeHtml(s.grade)}</td><td>${escapeHtml(s.className)}</td><td class="muted">${DB.parents.filter(p=>p.studentIds.includes(s.id)).map(p=>p.fullName).join('، ')||'-'}</td><td><button class="btn btn-ghost btn-sm delStu" data-id="${s.id}">حذف</button></td></tr>`).join('')}
+    ${DB.students.map(s=>`<tr><td class="name-strong" data-label="نام">${escapeHtml(s.fullName)}</td><td data-label="کد ملی">${faNum(s.nationalCode)}</td><td data-label="پایه">${escapeHtml(s.grade)}</td><td data-label="کلاس">${escapeHtml(s.className)}</td><td class="muted" data-label="والدین">${DB.parents.filter(p=>p.studentIds.includes(s.id)).map(p=>p.fullName).join('، ')||'-'}</td><td data-label=""><button class="btn btn-ghost btn-sm delStu" data-id="${s.id}">حذف</button></td></tr>`).join('')}
     </tbody></table></div>
   </div>`;
   document.getElementById('addStudent').onclick=()=>openStudentModal();
@@ -1409,7 +1470,7 @@ function renderParentsTab(body){
       <button class="btn btn-gold btn-sm" id="addParent">${ICO.plus} افزودن والد</button>
     </div>
     <div class="table-wrap"><table><thead><tr><th>نام</th><th>نسبت</th><th>کد ملی</th><th>کد ورود (پین)</th><th>فرزندان</th><th></th></tr></thead><tbody>
-    ${DB.parents.map(p=>`<tr><td class="name-strong">${escapeHtml(p.fullName)}</td><td>${escapeHtml(p.relation)}</td><td>${faNum(p.nationalCode)}</td><td>${faNum(p.pin)}</td><td class="muted">${DB.students.filter(s=>p.studentIds.includes(s.id)).map(s=>s.fullName).join('، ')||'-'}</td><td><button class="btn btn-ghost btn-sm delPar" data-id="${p.id}">حذف</button></td></tr>`).join('')}
+    ${DB.parents.map(p=>`<tr><td class="name-strong" data-label="نام">${escapeHtml(p.fullName)}</td><td data-label="نسبت">${escapeHtml(p.relation)}</td><td data-label="کد ملی">${faNum(p.nationalCode)}</td><td data-label="کد ورود">${faNum(p.pin)}</td><td class="muted" data-label="فرزندان">${DB.students.filter(s=>p.studentIds.includes(s.id)).map(s=>s.fullName).join('، ')||'-'}</td><td data-label=""><button class="btn btn-ghost btn-sm delPar" data-id="${p.id}">حذف</button></td></tr>`).join('')}
     </tbody></table></div>
   </div>`;
   document.getElementById('addParent').onclick=()=>openParentModal();
